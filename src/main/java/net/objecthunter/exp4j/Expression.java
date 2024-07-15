@@ -90,12 +90,12 @@ public class Expression {
     }
 
     public Set<String> getVariableNames() {
-        final Set<String> variables = new HashSet<>();
+        final Set<String> tVariables = new HashSet<>();
         for (final Token t : tokens) {
             if (t.getType() == Token.TOKEN_VARIABLE)
-                variables.add(((VariableToken) t).getName());
+                tVariables.add(((VariableToken) t).getName());
         }
-        return variables;
+        return tVariables;
     }
 
     public ValidationResult validate(boolean checkVariablesSet) {
@@ -104,9 +104,9 @@ public class Expression {
             /* check that all vars have a value set */
             for (final Token t : this.tokens) {
                 if (t.getType() == Token.TOKEN_VARIABLE) {
-                    final String var = ((VariableToken) t).getName();
-                    if (!variables.containsKey(var)) {
-                        errors.add("The setVariable '" + var + "' has not been set");
+                    final String vars = ((VariableToken) t).getName();
+                    if (!variables.containsKey(vars)) {
+                        errors.add("The setVariable '" + vars + "' has not been set");
                     }
                 }
             }
@@ -153,7 +153,7 @@ public class Expression {
         if (count > 1) {
             errors.add("Too many operands");
         }
-        return errors.size() == 0 ? ValidationResult.SUCCESS : new ValidationResult(false, errors);
+        return errors.isEmpty() ? ValidationResult.SUCCESS : new ValidationResult(false, errors);
 
     }
 

@@ -16,6 +16,7 @@
 
 package net.objecthunter.exp4j;
 
+import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.operator.Operator;
 import org.junit.Test;
@@ -66,7 +67,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testExpressionBuilder4() {
-        Function log2 = new Function("log2", 1) {
+        Function log2 = new AbstractFunction("log2") {
 
             @Override
             public double apply(double... args) {
@@ -84,7 +85,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testExpressionBuilder5() {
-        Function avg = new Function("avg", 4) {
+        Function avg = new AbstractFunction("avg", 4) {
 
             @Override
             public double apply(double... args) {
@@ -272,7 +273,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction1() {
-        Function custom = new Function("timespi") {
+        Function custom = new AbstractFunction("timespi") {
 
             @Override
             public double apply(double... values) {
@@ -290,7 +291,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction2() {
-        Function custom = new Function("loglog") {
+        Function custom = new AbstractFunction("loglog") {
 
             @Override
             public double apply(double... values) {
@@ -308,14 +309,14 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction3() {
-        Function custom1 = new Function("foo") {
+        Function custom1 = new AbstractFunction("foo") {
 
             @Override
             public double apply(double... values) {
                 return values[0] * Math.E;
             }
         };
-        Function custom2 = new Function("bar") {
+        Function custom2 = new AbstractFunction("bar") {
 
             @Override
             public double apply(double... values) {
@@ -334,7 +335,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction4() {
-        Function custom1 = new Function("foo") {
+        Function custom1 = new AbstractFunction("foo") {
 
             @Override
             public double apply(double... values) {
@@ -353,14 +354,14 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction5() {
-        Function custom1 = new Function("foo") {
+        Function custom1 = new AbstractFunction("foo") {
 
             @Override
             public double apply(double... values) {
                 return values[0] * Math.E;
             }
         };
-        Function custom2 = new Function("bar") {
+        Function custom2 = new AbstractFunction("bar") {
 
             @Override
             public double apply(double... values) {
@@ -380,14 +381,14 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction6() {
-        Function custom1 = new Function("foo") {
+        Function custom1 = new AbstractFunction("foo") {
 
             @Override
             public double apply(double... values) {
                 return values[0] * Math.E;
             }
         };
-        Function custom2 = new Function("bar") {
+        Function custom2 = new AbstractFunction("bar") {
 
             @Override
             public double apply(double... values) {
@@ -406,7 +407,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction7() {
-        Function custom1 = new Function("half") {
+        Function custom1 = new AbstractFunction("half") {
 
             @Override
             public double apply(double... values) {
@@ -423,7 +424,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction10() {
-        Function custom1 = new Function("max", 2) {
+        Function custom1 = new AbstractFunction("max", 2) {
 
             @Override
             public double apply(double... values) {
@@ -442,7 +443,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction11() {
-        Function custom1 = new Function("power", 2) {
+        Function custom1 = new AbstractFunction("power", 2) {
 
             @Override
             public double apply(double... values) {
@@ -462,7 +463,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction12() {
-        Function custom1 = new Function("max", 5) {
+        Function custom1 = new AbstractFunction("max", 5) {
 
             @Override
             public double apply(double... values) {
@@ -483,7 +484,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction13() {
-        Function custom1 = new Function("max", 3) {
+        Function custom1 = new AbstractFunction("max", 3) {
 
             @Override
             public double apply(double... values) {
@@ -507,7 +508,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction14() {
-        Function custom1 = new Function("multiply", 2) {
+        Function custom1 = new AbstractFunction("multiply", 2) {
 
             @Override
             public double apply(double... values) {
@@ -527,7 +528,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction15() {
-        Function custom1 = new Function("timesPi") {
+        Function custom1 = new AbstractFunction("timesPi") {
 
             @Override
             public double apply(double... values) {
@@ -547,7 +548,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction16() {
-        Function custom1 = new Function("multiply", 3) {
+        Function custom1 = new AbstractFunction("multiply", 3) {
 
             @Override
             public double apply(double... values) {
@@ -566,7 +567,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testFunction17() {
-        Function custom1 = new Function("timesPi") {
+        Function custom1 = new AbstractFunction("timesPi") {
 
             @Override
             public double apply(double... values) {
@@ -588,7 +589,7 @@ public class ExpressionBuilderTest {
     // i have this test, which fails in 0.2.9
     @Test
     public void testFunction18() {
-        Function minFunction = new Function("min", 2) {
+        Function minFunction = new AbstractFunction("min", 2) {
 
             @Override
             public double apply(double[] values) {
@@ -610,7 +611,7 @@ public class ExpressionBuilderTest {
     // i have this test, which fails in 0.3.2
     @Test
     public void testFunction19() {
-        Function minFunction = new Function("power", 2) {
+        Function minFunction = new AbstractFunction("power", 2) {
 
             @Override
             public double apply(double[] values) {
@@ -628,7 +629,7 @@ public class ExpressionBuilderTest {
     // this test has been added in 0.3.5
     @Test
     public void testFunction20() {
-        Function maxFunction = new Function("max", 3) {
+        Function maxFunction = new AbstractFunction("max", 3) {
 
             @Override
             public double apply(double... values) {
@@ -835,7 +836,7 @@ public class ExpressionBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFunction1() {
-        Function func = new Function("1gd") {
+        Function func = new AbstractFunction("1gd") {
 
             @Override
             public double apply(double... args) {
@@ -846,7 +847,7 @@ public class ExpressionBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFunction2() {
-        Function func = new Function("+1gd") {
+        Function func = new AbstractFunction("+1gd") {
 
             @Override
             public double apply(double... args) {
@@ -963,7 +964,7 @@ public class ExpressionBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSameName() {
-        Function custom = new Function("bar") {
+        Function custom = new AbstractFunction("bar") {
 
             @Override
             public double apply(double... values) {
@@ -1307,7 +1308,7 @@ public class ExpressionBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidNumberOfArguments2() {
-        Function avg = new Function("avg", 4) {
+        Function avg = new AbstractFunction("avg", 4) {
 
             @Override
             public double apply(double... args) {
@@ -1592,7 +1593,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testDocumentationExample6() {
-        Function logb = new Function("logb", 2) {
+        Function logb = new AbstractFunction("logb", 2) {
             @Override
             public double apply(double... args) {
                 return Math.log(args[0]) / Math.log(args[1]);
@@ -1608,7 +1609,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testDocumentationExample7() {
-        Function avg = new Function("avg", 4) {
+        Function avg = new AbstractFunction("avg", 4) {
 
             @Override
             public double apply(double... args) {
@@ -2557,7 +2558,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testUnicodeVariable3() {
-        Function log = new Function("λωγ", 1) {
+        Function log = new AbstractFunction("λωγ", 1) {
 
             @Override
             public double apply(double... args) {
@@ -2575,7 +2576,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testUnicodeVariable4() {
-        Function log = new Function("λ_ωγ", 1) {
+        Function log = new AbstractFunction("λ_ωγ", 1) {
 
             @Override
             public double apply(double... args) {
@@ -2669,7 +2670,7 @@ public class ExpressionBuilderTest {
     // https://github.com/fasseg/exp4j/issues/23
     @Test
     public void testSecondArgumentNegative() {
-        Function round = new Function("MULTIPLY", 2) {
+        Function round = new AbstractFunction("MULTIPLY", 2) {
             @Override
             public double apply(double... args) {
                 return Math.round(args[0] * args[1]);
@@ -2756,7 +2757,7 @@ public class ExpressionBuilderTest {
     public void testSameVariableAndUserFunctionName() {
         Expression e = new ExpressionBuilder("2*tr+tr(2)")
                 .variables("tr")
-                .function(new Function("tr") {
+                .function(new AbstractFunction("tr") {
                     @Override
                     public double apply(double... args) {
                         return 0;
@@ -2794,7 +2795,7 @@ public class ExpressionBuilderTest {
 
     @Test
     public void testCustomPercent() {
-        Function percentage = new Function("percentage", 2) {
+        Function percentage = new AbstractFunction("percentage", 2) {
             @Override
             public double apply(double... args) {
                 double val = args[0];

@@ -15,6 +15,7 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
+import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.operator.Operator;
 import org.junit.Test;
@@ -370,7 +371,7 @@ public class TokenizerTest {
 
     @Test
     public void testTokenization18() {
-        final Function log2 = new Function("log2") {
+        final Function log2 = new AbstractFunction("log2") {
 
             @Override
             public double apply(double... args) {
@@ -399,7 +400,7 @@ public class TokenizerTest {
 
     @Test
     public void testTokenization19() {
-        Function avg = new Function("avg", 2) {
+        Function avg = new AbstractFunction("avg", 2) {
 
             @Override
             public double apply(double... args) {

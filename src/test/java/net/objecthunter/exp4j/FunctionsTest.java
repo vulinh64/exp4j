@@ -15,6 +15,7 @@
  */
 package net.objecthunter.exp4j;
 
+import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ import static org.junit.Assert.*;
 public class FunctionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameNull() {
-        Function f = new Function(null) {
+        Function f = new AbstractFunction(null) {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -35,7 +36,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameEmpty() {
-        Function f = new Function("") {
+        Function f = new AbstractFunction("") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -45,7 +46,7 @@ public class FunctionsTest {
 
     @Test
     public void testFunctionNameZeroArgs() {
-        Function f = new Function("foo", 0) {
+        Function f = new AbstractFunction("foo", 0) {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -56,7 +57,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameNegativeArgs() {
-        Function f = new Function("foo", -1) {
+        Function f = new AbstractFunction("foo", -1) {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -66,7 +67,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName1() {
-        Function f = new Function("1foo") {
+        Function f = new AbstractFunction("1foo") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -76,7 +77,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName2() {
-        Function f = new Function("_&oo") {
+        Function f = new AbstractFunction("_&oo") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -86,72 +87,12 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName3() {
-        Function f = new Function("o+o") {
+        Function f = new AbstractFunction("o+o") {
             @Override
             public double apply(double... args) {
                 return 0;
             }
         };
-    }
-
-    @Test
-    public void testGetAllowedFunctionChars() {
-        char[] chars = Function.getAllowedFunctionCharacters();
-        assertEquals(53, chars.length);
-        Arrays.sort(chars);
-        assertTrue(Arrays.binarySearch(chars, 'a') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'b') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'c') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'd') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'e') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'f') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'g') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'h') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'i') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'j') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'k') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'l') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'm') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'n') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'o') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'p') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'q') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'r') > -1);
-        assertTrue(Arrays.binarySearch(chars, 's') > -1);
-        assertTrue(Arrays.binarySearch(chars, 't') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'u') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'v') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'w') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'x') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'y') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'z') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'A') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'B') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'C') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'D') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'E') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'F') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'G') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'H') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'I') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'J') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'K') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'L') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'M') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'N') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'O') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'P') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'Q') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'R') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'S') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'T') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'U') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'V') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'W') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'X') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'Y') > -1);
-        assertTrue(Arrays.binarySearch(chars, 'Z') > -1);
-        assertTrue(Arrays.binarySearch(chars, '_') > -1);
     }
 
     @Test

@@ -55,7 +55,7 @@ public abstract class Operator {
     /**
      * The set of allowed operator chars
      */
-    public static final char[] ALLOWED_OPERATOR_CHARS = {'+', '-', '*', '/', '%', '^', '!', '#', '§',
+    private static final char[] ALLOWED_OPERATOR_CHARS = {'+', '-', '*', '/', '%', '^', '!', '#', '§',
             '$', '&', ';', ':', '~', '<', '>', '|', '=', '÷', '√', '∛', '⌈', '⌊'};
 
     private final int numOperands;
@@ -71,7 +71,7 @@ public abstract class Operator {
      * @param leftAssociative  set to true if the operator is left associative, false if it is right associative
      * @param precedence       the precedence value of the operator
      */
-    public Operator(String symbol, int numberOfOperands, boolean leftAssociative,
+    protected Operator(String symbol, int numberOfOperands, boolean leftAssociative,
                     int precedence) {
         super();
         this.numOperands = numberOfOperands;

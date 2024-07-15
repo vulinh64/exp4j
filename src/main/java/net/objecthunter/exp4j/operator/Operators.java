@@ -15,7 +15,12 @@
  */
 package net.objecthunter.exp4j.operator;
 
-public abstract class Operators {
+public class Operators {
+
+    private Operators() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
+
     private static final int INDEX_ADDITION = 0;
     private static final int INDEX_SUBTRACTION = 1;
     private static final int INDEX_MULTIPLICATION = 2;

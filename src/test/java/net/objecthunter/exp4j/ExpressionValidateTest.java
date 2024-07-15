@@ -15,6 +15,7 @@
  */
 package net.objecthunter.exp4j;
 
+import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class ExpressionValidateTest {
     /**
      * Dummy function with 2 arguments.
      */
-    private final Function beta = new Function("beta", 2) {
+    private final Function beta = new AbstractFunction("beta", 2) {
 
         @Override
         public double apply(double... args) {
@@ -40,7 +41,7 @@ public class ExpressionValidateTest {
     /**
      * Dummy function with 3 arguments.
      */
-    private final Function gamma = new Function("gamma", 3) {
+    private final Function gamma = new AbstractFunction("gamma", 3) {
 
         @Override
         public double apply(double... args) {
@@ -51,7 +52,7 @@ public class ExpressionValidateTest {
     /**
      * Dummy function with 7 arguments.
      */
-    private final Function eta = new Function("eta", 7) {
+    private final Function eta = new AbstractFunction("eta", 7) {
 
         @Override
         public double apply(double... args) {
@@ -279,7 +280,7 @@ public class ExpressionValidateTest {
     // https://github.com/fasseg/exp4j/issues/59
     @Test
     public void testNoArgFunctionValidation() {
-        Function now = new Function("now", 0) {
+        Function now = new AbstractFunction("now", 0) {
             @Override
             public double apply(double... args) {
                 return (double) new Date().getTime();
