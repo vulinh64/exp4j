@@ -73,12 +73,12 @@ public class Tokenizer {
         }
         if (Character.isDigit(ch) || ch == '.') {
             if (lastToken != null) {
-                if (lastToken.getType() == Token.TOKEN_NUMBER) {
+                if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
                     throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
-                } else if (implicitMultiplication && (lastToken.getType() != Token.TOKEN_OPERATOR
-                        && lastToken.getType() != Token.TOKEN_PARENTHESES_OPEN
-                        && lastToken.getType() != Token.TOKEN_FUNCTION
-                        && lastToken.getType() != Token.TOKEN_SEPARATOR)) {
+                } else if (implicitMultiplication && (lastToken.getType() != TokenType.TOKEN_OPERATOR
+                        && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+                        && lastToken.getType() != TokenType.TOKEN_FUNCTION
+                        && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
                     // insert an implicit multiplication token
                     lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
                     return lastToken;
@@ -89,10 +89,10 @@ public class Tokenizer {
             return parseArgumentSeparatorToken();
         } else if (isOpenParentheses(ch)) {
             if (lastToken != null && implicitMultiplication &&
-                    (lastToken.getType() != Token.TOKEN_OPERATOR
-                            && lastToken.getType() != Token.TOKEN_PARENTHESES_OPEN
-                            && lastToken.getType() != Token.TOKEN_FUNCTION
-                            && lastToken.getType() != Token.TOKEN_SEPARATOR)) {
+                    (lastToken.getType() != TokenType.TOKEN_OPERATOR
+                            && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+                            && lastToken.getType() != TokenType.TOKEN_FUNCTION
+                            && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
                 // insert an implicit multiplication token
                 lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
                 return lastToken;
@@ -105,10 +105,10 @@ public class Tokenizer {
         } else if (isAlphabetic(ch) || ch == '_') {
             // parse the name which can be a setVariable or a function
             if (lastToken != null && implicitMultiplication &&
-                    (lastToken.getType() != Token.TOKEN_OPERATOR
-                            && lastToken.getType() != Token.TOKEN_PARENTHESES_OPEN
-                            && lastToken.getType() != Token.TOKEN_FUNCTION
-                            && lastToken.getType() != Token.TOKEN_SEPARATOR)) {
+                    (lastToken.getType() != TokenType.TOKEN_OPERATOR
+                            && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+                            && lastToken.getType() != TokenType.TOKEN_FUNCTION
+                            && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
                 // insert an implicit multiplication token
                 lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
                 return lastToken;
@@ -228,10 +228,10 @@ public class Tokenizer {
             if (lastToken == null) {
                 argc = 1;
             } else {
-                int lastTokenType = lastToken.getType();
-                if (lastTokenType == Token.TOKEN_PARENTHESES_OPEN || lastTokenType == Token.TOKEN_SEPARATOR) {
+                TokenType lastTokenType = lastToken.getType();
+                if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN || lastTokenType == TokenType.TOKEN_SEPARATOR) {
                     argc = 1;
-                } else if (lastTokenType == Token.TOKEN_OPERATOR) {
+                } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
                     final Operator lastOp = ((OperatorToken) lastToken).getOperator();
                     if (lastOp.getNumOperands() == 2 || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
                         argc = 1;

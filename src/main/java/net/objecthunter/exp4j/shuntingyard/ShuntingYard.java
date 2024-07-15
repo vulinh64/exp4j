@@ -19,6 +19,7 @@ import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.tokenizer.OperatorToken;
 import net.objecthunter.exp4j.tokenizer.Token;
+import net.objecthunter.exp4j.tokenizer.TokenType;
 import net.objecthunter.exp4j.tokenizer.Tokenizer;
 
 import java.util.*;
@@ -42,8 +43,8 @@ public class ShuntingYard {
      * @param implicitMultiplication set to false to turn off implicit multiplication
      * @return a {@link net.objecthunter.exp4j.tokenizer.Token} array containing the result
      */
-    public static Token[] convertToRPN(final String expression, final Map<String, Function> userFunctions,
-                                       final Map<String, Operator> userOperators, final Set<String> variableNames, final boolean implicitMultiplication) {
+    public static List<Token> convertToRPN(final String expression, final Map<String, Function> userFunctions,
+                                           final Map<String, Operator> userOperators, final Set<String> variableNames, final boolean implicitMultiplication) {
         final Deque<Token> deque = new ArrayDeque<>();
         final List<Token> output = new ArrayList<>();
 
@@ -51,23 +52,23 @@ public class ShuntingYard {
         while (tokenizer.hasNext()) {
             Token token = tokenizer.nextToken();
             switch (token.getType()) {
-                case Token.TOKEN_NUMBER:
-                case Token.TOKEN_VARIABLE:
+                case TOKEN_NUMBER:
+                case TOKEN_VARIABLE:
                     output.add(token);
                     break;
-                case Token.TOKEN_FUNCTION:
+                case TOKEN_FUNCTION:
                     deque.add(token);
                     break;
-                case Token.TOKEN_SEPARATOR:
-                    while (!deque.isEmpty() && deque.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
+                case TOKEN_SEPARATOR:
+                    while (!deque.isEmpty() && deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
                         output.add(deque.pop());
                     }
-                    if (deque.isEmpty() || deque.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
+                    if (deque.isEmpty() || deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
                         throw new IllegalArgumentException("Misplaced function separator ',' or mismatched parentheses");
                     }
                     break;
-                case Token.TOKEN_OPERATOR:
-                    while (!deque.isEmpty() && deque.peek().getType() == Token.TOKEN_OPERATOR) {
+                case TOKEN_OPERATOR:
+                    while (!deque.isEmpty() && deque.peek().getType() == TokenType.TOKEN_OPERATOR) {
                         OperatorToken o1 = (OperatorToken) token;
                         OperatorToken o2 = (OperatorToken) deque.peek();
                         if (o1.getOperator().getNumOperands() == 1 && o2.getOperator().getNumOperands() == 2) {
@@ -81,15 +82,15 @@ public class ShuntingYard {
                     }
                     deque.push(token);
                     break;
-                case Token.TOKEN_PARENTHESES_OPEN:
+                case TOKEN_PARENTHESES_OPEN:
                     deque.push(token);
                     break;
-                case Token.TOKEN_PARENTHESES_CLOSE:
-                    while (deque.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
+                case TOKEN_PARENTHESES_CLOSE:
+                    while (deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
                         output.add(deque.pop());
                     }
                     deque.pop();
-                    if (!deque.isEmpty() && deque.peek().getType() == Token.TOKEN_FUNCTION) {
+                    if (!deque.isEmpty() && deque.peek().getType() == TokenType.TOKEN_FUNCTION) {
                         output.add(deque.pop());
                     }
                     break;
@@ -99,12 +100,12 @@ public class ShuntingYard {
         }
         while (!deque.isEmpty()) {
             Token t = deque.pop();
-            if (t.getType() == Token.TOKEN_PARENTHESES_CLOSE || t.getType() == Token.TOKEN_PARENTHESES_OPEN) {
+            if (t.getType() == TokenType.TOKEN_PARENTHESES_CLOSE || t.getType() == TokenType.TOKEN_PARENTHESES_OPEN) {
                 throw new IllegalArgumentException("Mismatched parentheses detected. Please check the expression");
             } else {
                 output.add(t);
             }
         }
-        return output.toArray(new Token[0]);
+        return output;
     }
 }

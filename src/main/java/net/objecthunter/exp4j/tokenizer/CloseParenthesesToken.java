@@ -24,6 +24,6 @@ class CloseParenthesesToken extends Token {
      * Create a new instance
      */
     CloseParenthesesToken() {
-        super(Token.TOKEN_PARENTHESES_CLOSE);
+        super(TokenType.TOKEN_PARENTHESES_CLOSE);
     }
 }

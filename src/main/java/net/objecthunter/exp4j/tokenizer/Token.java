@@ -27,13 +27,13 @@ public abstract class Token {
     public static final short TOKEN_VARIABLE = 6;
     public static final short TOKEN_SEPARATOR = 7;
 
-    private final int type;
+    private final TokenType type;
 
-    Token(int type) {
+    Token(TokenType type) {
         this.type = type;
     }
 
-    public int getType() {
+    public TokenType getType() {
         return type;
     }
 

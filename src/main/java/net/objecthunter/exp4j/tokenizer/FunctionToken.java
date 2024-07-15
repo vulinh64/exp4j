@@ -21,7 +21,7 @@ public class FunctionToken extends Token {
     private final Function function;
 
     public FunctionToken(final Function function) {
-        super(Token.TOKEN_FUNCTION);
+        super(TokenType.TOKEN_FUNCTION);
         this.function = function;
     }
 

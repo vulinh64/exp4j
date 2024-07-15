@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
 
 public class Expression {
 
-    private final Token[] tokens;
+    private final List<Token> tokens;
 
     private final Map<String, Double> variables;
 
@@ -47,19 +47,21 @@ public class Expression {
      * @param existing the expression to copy
      */
     public Expression(final Expression existing) {
-        this.tokens = Arrays.copyOf(existing.tokens, existing.tokens.length);
+        this.tokens = new ArrayList<>();
+        tokens.addAll(existing.tokens);
+
         this.variables = new HashMap<>();
         this.variables.putAll(existing.variables);
         this.userFunctionNames = new HashSet<>(existing.userFunctionNames);
     }
 
-    Expression(final Token[] tokens) {
+    Expression(final List<Token> tokens) {
         this.tokens = tokens;
         this.variables = createDefaultVariables();
         this.userFunctionNames = Collections.emptySet();
     }
 
-    Expression(final Token[] tokens, Set<String> userFunctionNames) {
+    Expression(final List<Token> tokens, Set<String> userFunctionNames) {
         this.tokens = tokens;
         this.variables = createDefaultVariables();
         this.userFunctionNames = userFunctionNames;
@@ -92,7 +94,7 @@ public class Expression {
     public Set<String> getVariableNames() {
         final Set<String> tVariables = new HashSet<>();
         for (final Token t : tokens) {
-            if (t.getType() == Token.TOKEN_VARIABLE)
+            if (t.getType() == TokenType.TOKEN_VARIABLE)
                 tVariables.add(((VariableToken) t).getName());
         }
         return tVariables;
@@ -103,7 +105,7 @@ public class Expression {
         if (checkVariablesSet) {
             /* check that all vars have a value set */
             for (final Token t : this.tokens) {
-                if (t.getType() == Token.TOKEN_VARIABLE) {
+                if (t.getType() == TokenType.TOKEN_VARIABLE) {
                     final String vars = ((VariableToken) t).getName();
                     if (!variables.containsKey(vars)) {
                         errors.add("The setVariable '" + vars + "' has not been set");
@@ -121,11 +123,11 @@ public class Expression {
         int count = 0;
         for (Token tok : this.tokens) {
             switch (tok.getType()) {
-                case Token.TOKEN_NUMBER:
-                case Token.TOKEN_VARIABLE:
+                case TOKEN_NUMBER:
+                case TOKEN_VARIABLE:
                     count++;
                     break;
-                case Token.TOKEN_FUNCTION:
+                case TOKEN_FUNCTION:
                     final Function func = ((FunctionToken) tok).getFunction();
                     final int argsNum = func.getNumArguments();
                     if (argsNum > count) {
@@ -138,12 +140,13 @@ public class Expression {
                         count++;
                     }
                     break;
-                case Token.TOKEN_OPERATOR:
+                case TOKEN_OPERATOR:
                     Operator op = ((OperatorToken) tok).getOperator();
                     if (op.getNumOperands() == 2) {
                         count--;
                     }
                     break;
+                default: break;
             }
             if (count < 1) {
                 errors.add("Too many operators");
@@ -166,18 +169,18 @@ public class Expression {
     }
 
     public double evaluate() {
-        final ArrayStack output = new ArrayStack();
+        final Deque<Double> output = new ArrayDeque<>();
         for (Token t : tokens) {
-            if (t.getType() == Token.TOKEN_NUMBER) {
+            if (t.getType() == TokenType.TOKEN_NUMBER) {
                 output.push(((NumberToken) t).getValue());
-            } else if (t.getType() == Token.TOKEN_VARIABLE) {
+            } else if (t.getType() == TokenType.TOKEN_VARIABLE) {
                 final String name = ((VariableToken) t).getName();
                 final Double value = this.variables.get(name);
                 if (value == null) {
                     throw new IllegalArgumentException("No value has been set for the setVariable '" + name + "'.");
                 }
                 output.push(value);
-            } else if (t.getType() == Token.TOKEN_OPERATOR) {
+            } else if (t.getType() == TokenType.TOKEN_OPERATOR) {
                 OperatorToken op = (OperatorToken) t;
                 if (output.size() < op.getOperator().getNumOperands()) {
                     throw new IllegalArgumentException("Invalid number of operands available for '" + op.getOperator().getSymbol() + "' operator");
@@ -192,7 +195,7 @@ public class Expression {
                     double arg = output.pop();
                     output.push(op.getOperator().apply(arg));
                 }
-            } else if (t.getType() == Token.TOKEN_FUNCTION) {
+            } else if (t.getType() == TokenType.TOKEN_FUNCTION) {
                 FunctionToken func = (FunctionToken) t;
                 final int numArguments = func.getFunction().getNumArguments();
                 if (output.size() < numArguments) {

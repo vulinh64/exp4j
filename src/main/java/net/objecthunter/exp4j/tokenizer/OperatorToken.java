@@ -29,7 +29,7 @@ public class OperatorToken extends Token {
      * @param op the operator
      */
     public OperatorToken(Operator op) {
-        super(Token.TOKEN_OPERATOR);
+        super(TokenType.TOKEN_OPERATOR);
         if (op == null) {
             throw new IllegalArgumentException("Operator is unknown for token.");
         }

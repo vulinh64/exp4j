@@ -22,8 +22,10 @@ import net.objecthunter.exp4j.tokenizer.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.Executor;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
@@ -32,32 +34,21 @@ import static org.junit.Assert.*;
 public class ExpressionTest {
     @Test
     public void testExpression1() {
-        Token[] tokens = new Token[]{
-                new NumberToken(3d),
-                new NumberToken(2d),
-                new OperatorToken(Operators.getBuiltinOperator('+', 2))
-        };
+        List<Token> tokens = Arrays.asList(new NumberToken(3d), new NumberToken(2d), new OperatorToken(Operators.getBuiltinOperator('+', 2)));
         Expression exp = new Expression(tokens);
         assertEquals(5d, exp.evaluate(), 0d);
     }
 
     @Test
     public void testExpression2() {
-        Token[] tokens = new Token[]{
-                new NumberToken(1d),
-                new FunctionToken(Functions.getBuiltinFunction("log")),
-        };
+        List<Token> tokens = Arrays.asList(new NumberToken(1d), new FunctionToken(Functions.getBuiltinFunction("log")));
         Expression exp = new Expression(tokens);
         assertEquals(0d, exp.evaluate(), 0d);
     }
 
     @Test
     public void testGetVariableNames1() {
-        Token[] tokens = new Token[]{
-                new VariableToken("a"),
-                new VariableToken("b"),
-                new OperatorToken(Operators.getBuiltinOperator('+', 2))
-        };
+        List<Token> tokens = Arrays.asList(new VariableToken("a"), new VariableToken("b"), new OperatorToken(Operators.getBuiltinOperator('+', 2)));
         Expression exp = new Expression(tokens);
 
         assertEquals(2, exp.getVariableNames().size());
@@ -268,18 +259,19 @@ public class ExpressionTest {
         final Expression e = new ExpressionBuilder("sin(x)")
                 .variable("x")
                 .build();
-        Executor executor = Executors.newFixedThreadPool(100);
-        for (int i = 0; i < 100000; i++) {
-            executor.execute(() -> {
-                double x = Math.random();
-                e.setVariable("x", x);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-                assertEquals(Math.sin(x), e.evaluate(), 0f);
-            });
+        try (ExecutorService executor = Executors.newFixedThreadPool(100)) {
+            for (int i = 0; i < 100000; i++) {
+                executor.execute(() -> {
+                    double x = Math.random();
+                    e.setVariable("x", x);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e1) {
+                        throw new RuntimeException("thread interrupted");
+                    }
+                    assertEquals(Math.sin(x), e.evaluate(), 0f);
+                });
+            }
         }
     }
 }

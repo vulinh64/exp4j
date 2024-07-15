@@ -45,7 +45,7 @@ public class ExpressionBuilder {
      * @param expression the expression to be parsed
      */
     public ExpressionBuilder(String expression) {
-        if (expression == null || expression.trim().length() == 0) {
+        if (expression == null || expression.trim().isEmpty()) {
             throw new IllegalArgumentException("Expression can not be empty");
         }
         this.expression = expression;
@@ -182,7 +182,7 @@ public class ExpressionBuilder {
      * @return an {@link Expression} instance which can be used to evaluate the result of the expression
      */
     public Expression build() {
-        if (expression.length() == 0) {
+        if (expression.isEmpty()) {
             throw new IllegalArgumentException("The expression can not be empty");
         }
 

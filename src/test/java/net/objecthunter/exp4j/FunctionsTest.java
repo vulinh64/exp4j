@@ -19,8 +19,6 @@ import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.*;
 
 public class FunctionsTest {
