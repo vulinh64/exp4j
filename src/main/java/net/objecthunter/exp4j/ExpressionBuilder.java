@@ -19,6 +19,7 @@ package net.objecthunter.exp4j;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
 import net.objecthunter.exp4j.operator.Operator;
+import net.objecthunter.exp4j.operator.Operators;
 import net.objecthunter.exp4j.shuntingyard.ShuntingYard;
 
 import java.util.*;
@@ -144,7 +145,7 @@ public class ExpressionBuilder {
     private void checkOperatorSymbol(Operator op) {
         String name = op.getSymbol();
         for (char ch : name.toCharArray()) {
-            if (!Operator.isAllowedOperatorChar(ch)) {
+            if (!Operators.isAllowedOperatorChar(ch)) {
                 throw new IllegalArgumentException("The operator symbol '" + name + "' is invalid");
             }
         }
@@ -194,7 +195,7 @@ public class ExpressionBuilder {
 
         /* Check if there are duplicate vars/functions */
         for (String v : variableNames) {
-            if (Functions.getBuiltinFunction(v) != null || userFunctions.containsKey(v)) {
+            if (Functions.getBuiltInFunction(v) != null || userFunctions.containsKey(v)) {
                 throw new IllegalArgumentException("A variable can not have the same name as a function [" + v + "]");
             }
         }

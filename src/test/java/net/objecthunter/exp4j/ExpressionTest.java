@@ -38,7 +38,7 @@ public class ExpressionTest {
 
     @Test
     public void testExpression2() {
-        List<Token> tokens = Arrays.asList(new NumberToken(1d), new FunctionToken(Functions.getBuiltinFunction("log")));
+        List<Token> tokens = Arrays.asList(new NumberToken(1d), new FunctionToken(Functions.getBuiltInFunction("log")));
         Expression exp = new Expression(tokens);
         assertEquals(0d, exp.evaluate(), 0d);
     }
@@ -53,7 +53,7 @@ public class ExpressionTest {
 
     @Test
     public void testFactorial() {
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        Operator factorial = new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
 
             @Override
             public double apply(double... args) {
@@ -163,7 +163,7 @@ public class ExpressionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testOperatorFactorial2() {
-        new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
 
             @Override
             public double apply(double... args) {
@@ -188,7 +188,7 @@ public class ExpressionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFactorial2() {
-        new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
 
             @Override
             public double apply(double... args) {

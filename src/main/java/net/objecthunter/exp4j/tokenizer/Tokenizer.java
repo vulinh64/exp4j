@@ -90,7 +90,7 @@ public class Tokenizer {
             return parseParentheses(false);
         }
 
-        if (Operator.isAllowedOperatorChar(ch)) {
+        if (Operators.isAllowedOperatorChar(ch)) {
             return parseOperatorToken(ch);
         }
 
@@ -202,7 +202,7 @@ public class Tokenizer {
             f = userFunctions.get(name);
         }
         if (f == null) {
-            f = Functions.getBuiltinFunction(name);
+            f = Functions.getBuiltInFunction(name);
         }
         return f;
     }
@@ -214,7 +214,7 @@ public class Tokenizer {
         Operator lastValid = null;
         symbol.append(firstChar);
 
-        while (!isEndOfExpression(offset + len) && Operator.isAllowedOperatorChar(expression[offset + len])) {
+        while (!isEndOfExpression(offset + len) && Operators.isAllowedOperatorChar(expression[offset + len])) {
             symbol.append(expression[offset + len++]);
         }
 

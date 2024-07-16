@@ -1,4 +1,7 @@
-package net.objecthunter.exp4j.function;
+package net.objecthunter.exp4j;
+
+import net.objecthunter.exp4j.function.Function;
+import net.objecthunter.exp4j.function.Functions;
 
 public abstract class AbstractFunction implements Function {
 

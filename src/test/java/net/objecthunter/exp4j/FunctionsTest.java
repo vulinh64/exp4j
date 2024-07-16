@@ -15,7 +15,6 @@
  */
 package net.objecthunter.exp4j;
 
-import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
 import org.junit.Test;

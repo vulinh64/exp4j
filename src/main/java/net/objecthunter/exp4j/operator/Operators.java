@@ -17,104 +17,80 @@ package net.objecthunter.exp4j.operator;
 
 public class Operators {
 
+    /**
+     * The precedence value for the addition operation
+     */
+    public static final int PRECEDENCE_ADDITION = 500;
+    /**
+     * The precedence value for the subtraction operation
+     */
+    public static final int PRECEDENCE_SUBTRACTION = PRECEDENCE_ADDITION;
+    /**
+     * The precedence value for the multiplication operation
+     */
+    public static final int PRECEDENCE_MULTIPLICATION = 1000;
+    /**
+     * The precedence value for the division operation
+     */
+    public static final int PRECEDENCE_DIVISION = PRECEDENCE_MULTIPLICATION;
+    /**
+     * The precedence value for the modulo operation
+     */
+    public static final int PRECEDENCE_MODULO = PRECEDENCE_DIVISION;
+    /**
+     * The precedence value for the power operation
+     */
+    public static final int PRECEDENCE_POWER = 10000;
+    /**
+     * The precedence value for the unary minus operation
+     */
+    public static final int PRECEDENCE_UNARY_MINUS = 5000;
+    /**
+     * The precedence value for the unary plus operation
+     */
+    public static final int PRECEDENCE_UNARY_PLUS = PRECEDENCE_UNARY_MINUS;
+    /**
+     * The set of allowed operator chars
+     */
+    private static final char[] ALLOWED_OPERATOR_CHARS = {'+', '-', '*', '/', '%', '^', '!', '#', '§',
+            '$', '&', ';', ':', '~', '<', '>', '|', '=', '÷', '√', '∛', '⌈', '⌊'};
+
     private Operators() {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 
-    private static final int INDEX_ADDITION = 0;
-    private static final int INDEX_SUBTRACTION = 1;
-    private static final int INDEX_MULTIPLICATION = 2;
-    private static final int INDEX_DIVISION = 3;
-    private static final int INDEX_POWER = 4;
-    private static final int INDEX_MODULO = 5;
-    private static final int INDEX_UNARY_MINUS = 6;
-    private static final int INDEX_UNARY_PLUS = 7;
-
-    private static final Operator[] BUILT_IN_OPERATORS = new Operator[8];
-
-    static {
-        BUILT_IN_OPERATORS[INDEX_ADDITION] = new Operator("+", 2, true, Operator.PRECEDENCE_ADDITION) {
-            @Override
-            public double apply(final double... args) {
-                return args[0] + args[1];
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_SUBTRACTION] = new Operator("-", 2, true, Operator.PRECEDENCE_ADDITION) {
-            @Override
-            public double apply(final double... args) {
-                return args[0] - args[1];
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_UNARY_MINUS] = new Operator("-", 1, false, Operator.PRECEDENCE_UNARY_MINUS) {
-            @Override
-            public double apply(final double... args) {
-                return -args[0];
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_UNARY_PLUS] = new Operator("+", 1, false, Operator.PRECEDENCE_UNARY_PLUS) {
-            @Override
-            public double apply(final double... args) {
-                return args[0];
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_MULTIPLICATION] = new Operator("*", 2, true, Operator.PRECEDENCE_MULTIPLICATION) {
-            @Override
-            public double apply(final double... args) {
-                return args[0] * args[1];
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_DIVISION] = new Operator("/", 2, true, Operator.PRECEDENCE_DIVISION) {
-            @Override
-            public double apply(final double... args) {
-                if (args[1] == 0d) {
-                    throw new ArithmeticException("Division by zero!");
-                }
-                return args[0] / args[1];
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_POWER] = new Operator("^", 2, false, Operator.PRECEDENCE_POWER) {
-            @Override
-            public double apply(final double... args) {
-                return Math.pow(args[0], args[1]);
-            }
-        };
-        BUILT_IN_OPERATORS[INDEX_MODULO] = new Operator("%", 2, true, Operator.PRECEDENCE_MODULO) {
-            @Override
-            public double apply(final double... args) {
-                if (args[1] == 0d) {
-                    throw new ArithmeticException("Division by zero!");
-                }
-                return args[0] % args[1];
-            }
-        };
-    }
-
-    public static Operator getBuiltinOperator(final char symbol, final int numArguments) {
+    public static Operator getBuiltinOperator(char symbol, int numArguments) {
         switch (symbol) {
             case '+':
-                if (numArguments != 1) {
-                    return BUILT_IN_OPERATORS[INDEX_ADDITION];
-                }
-
-                return BUILT_IN_OPERATORS[INDEX_UNARY_PLUS];
+                return numArguments != 1 ? BinaryOperators.ADDITION : UnaryOperators.UNARY_PLUS;
             case '-':
-                if (numArguments != 1) {
-                    return BUILT_IN_OPERATORS[INDEX_SUBTRACTION];
-                }
-
-                return BUILT_IN_OPERATORS[INDEX_UNARY_MINUS];
+                return numArguments != 1 ? BinaryOperators.SUBTRACTION : UnaryOperators.UNARY_MINUS;
             case '*':
-                return BUILT_IN_OPERATORS[INDEX_MULTIPLICATION];
+                return BinaryOperators.MULTIPLICATION;
             case '÷':
             case '/':
-                return BUILT_IN_OPERATORS[INDEX_DIVISION];
+                return BinaryOperators.DIVISION;
             case '^':
-                return BUILT_IN_OPERATORS[INDEX_POWER];
+                return BinaryOperators.POWER;
             case '%':
-                return BUILT_IN_OPERATORS[INDEX_MODULO];
+                return BinaryOperators.MODULO;
             default:
                 return null;
         }
     }
 
+    /**
+     * Check if a character is an allowed operator char
+     *
+     * @param ch the char to check
+     * @return true if the char is allowed an an operator symbol, false otherwise
+     */
+    public static boolean isAllowedOperatorChar(char ch) {
+        for (char allowed : ALLOWED_OPERATOR_CHARS) {
+            if (ch == allowed) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

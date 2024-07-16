@@ -33,7 +33,7 @@ public class Expression {
     private final Set<String> userFunctionNames;
 
     private static Map<String, Double> createDefaultVariables() {
-        final Map<String, Double> vars = new HashMap<>(4);
+        Map<String, Double> vars = new HashMap<>(4);
         vars.put("pi", Math.PI);
         vars.put("π", Math.PI);
         vars.put("φ", 1.61803398874d);
@@ -46,69 +46,69 @@ public class Expression {
      *
      * @param existing the expression to copy
      */
-    public Expression(final Expression existing) {
-        this.tokens = new ArrayList<>();
+    public Expression(Expression existing) {
+        tokens = new ArrayList<>();
         tokens.addAll(existing.tokens);
 
-        this.variables = new HashMap<>();
-        this.variables.putAll(existing.variables);
-        this.userFunctionNames = new HashSet<>(existing.userFunctionNames);
+        variables = new HashMap<>();
+        variables.putAll(existing.variables);
+        userFunctionNames = new HashSet<>(existing.userFunctionNames);
     }
 
-    Expression(final List<Token> tokens) {
+    Expression(List<Token> tokens) {
         this.tokens = tokens;
-        this.variables = createDefaultVariables();
-        this.userFunctionNames = Collections.emptySet();
+        variables = createDefaultVariables();
+        userFunctionNames = Collections.emptySet();
     }
 
-    Expression(final List<Token> tokens, Set<String> userFunctionNames) {
+    Expression(List<Token> tokens, Set<String> userFunctionNames) {
         this.tokens = tokens;
-        this.variables = createDefaultVariables();
+        variables = createDefaultVariables();
         this.userFunctionNames = userFunctionNames;
     }
 
-    public Expression setVariable(final String name, final double value) {
-        this.checkVariableName(name);
-        this.variables.put(name, value);
+    public Expression setVariable(String name, double value) {
+        checkVariableName(name);
+        variables.put(name, value);
         return this;
     }
 
     private void checkVariableName(String name) {
-        if (this.userFunctionNames.contains(name) || Functions.getBuiltinFunction(name) != null) {
-            throw new IllegalArgumentException("The variable name '" + name + "' is invalid. Since there exists a function with the same name");
+        if (userFunctionNames.contains(name) || Functions.getBuiltInFunction(name) != null) {
+            throw new IllegalArgumentException(String.format("The variable name '%s' is invalid. Since there exists a function with the same name", name));
         }
     }
 
     public Expression setVariables(Map<String, Double> variables) {
         for (Map.Entry<String, Double> v : variables.entrySet()) {
-            this.setVariable(v.getKey(), v.getValue());
+            setVariable(v.getKey(), v.getValue());
         }
         return this;
     }
 
-    public Expression clearVariables() {
-        this.variables.clear();
-        return this;
+    public void clearVariables() {
+        variables.clear();
     }
 
     public Set<String> getVariableNames() {
-        final Set<String> tVariables = new HashSet<>();
-        for (final Token t : tokens) {
-            if (t.getType() == TokenType.TOKEN_VARIABLE)
+        Set<String> tVariables = new HashSet<>();
+        for (Token t : tokens) {
+            if (t.getType() == TokenType.TOKEN_VARIABLE) {
                 tVariables.add(((VariableToken) t).getName());
+            }
         }
         return tVariables;
     }
 
     public ValidationResult validate(boolean checkVariablesSet) {
-        final List<String> errors = new ArrayList<>(0);
+        List<String> errors = new ArrayList<>(0);
         if (checkVariablesSet) {
             /* check that all vars have a value set */
-            for (final Token t : this.tokens) {
+            for (Token t : tokens) {
                 if (t.getType() == TokenType.TOKEN_VARIABLE) {
-                    final String vars = ((VariableToken) t).getName();
+                    String vars = ((VariableToken) t).getName();
                     if (!variables.containsKey(vars)) {
-                        errors.add("The setVariable '" + vars + "' has not been set");
+                        errors.add(String.format("The setVariable '%s' has not been set", vars));
                     }
                 }
             }
@@ -121,15 +121,15 @@ public class Expression {
            The count has to be larger than 1 at all times and exactly 1 after all tokens
            have been processed */
         int count = 0;
-        for (Token tok : this.tokens) {
+        for (Token tok : tokens) {
             switch (tok.getType()) {
                 case TOKEN_NUMBER:
                 case TOKEN_VARIABLE:
                     count++;
                     break;
                 case TOKEN_FUNCTION:
-                    final Function func = ((FunctionToken) tok).getFunction();
-                    final int argsNum = func.getNumArguments();
+                    Function func = ((FunctionToken) tok).getFunction();
+                    int argsNum = func.getNumArguments();
                     if (argsNum > count) {
                         errors.add("Not enough arguments for '" + func.getName() + "'");
                     }
@@ -146,7 +146,8 @@ public class Expression {
                         count--;
                     }
                     break;
-                default: break;
+                default:
+                    break;
             }
             if (count < 1) {
                 errors.add("Too many operators");
@@ -169,13 +170,13 @@ public class Expression {
     }
 
     public double evaluate() {
-        final Deque<Double> output = new ArrayDeque<>();
+        Deque<Double> output = new ArrayDeque<>();
         for (Token t : tokens) {
             if (t.getType() == TokenType.TOKEN_NUMBER) {
                 output.push(((NumberToken) t).getValue());
             } else if (t.getType() == TokenType.TOKEN_VARIABLE) {
-                final String name = ((VariableToken) t).getName();
-                final Double value = this.variables.get(name);
+                String name = ((VariableToken) t).getName();
+                Double value = variables.get(name);
                 if (value == null) {
                     throw new IllegalArgumentException("No value has been set for the setVariable '" + name + "'.");
                 }
@@ -197,7 +198,7 @@ public class Expression {
                 }
             } else if (t.getType() == TokenType.TOKEN_FUNCTION) {
                 FunctionToken func = (FunctionToken) t;
-                final int numArguments = func.getFunction().getNumArguments();
+                int numArguments = func.getFunction().getNumArguments();
                 if (output.size() < numArguments) {
                     throw new IllegalArgumentException("Invalid number of arguments available for '" + func.getFunction().getName() + "' function");
                 }
