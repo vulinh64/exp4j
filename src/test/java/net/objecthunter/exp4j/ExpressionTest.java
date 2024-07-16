@@ -19,14 +19,11 @@ import net.objecthunter.exp4j.function.Functions;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.operator.Operators;
 import net.objecthunter.exp4j.tokenizer.*;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 
@@ -247,32 +244,6 @@ public class ExpressionTest {
             fail("Should fail as there aren't values in the expression.");
         } catch (Exception ignored) {
 
-        }
-
-    }
-
-
-    @Test
-    @Ignore("unknown")
-    // If Expression should be threads safe this test must pass
-    public void evaluateFamily() {
-        Expression e = new ExpressionBuilder("sin(x)")
-                .variable("x")
-                .build();
-
-        ExecutorService executor = Executors.newFixedThreadPool(100);
-
-        for (int i = 0; i < 100000; i++) {
-            executor.execute(() -> {
-                double x = Math.random();
-                e.setVariable("x", x);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e1) {
-                    throw new RuntimeException("thread interrupted");
-                }
-                assertEquals(Math.sin(x), e.evaluate(), 0f);
-            });
         }
 
     }
