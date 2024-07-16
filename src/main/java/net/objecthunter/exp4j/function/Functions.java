@@ -111,6 +111,28 @@ public class Functions {
         return MAPS.get(name);
     }
 
+    public static boolean isValidFunctionName(String name) {
+        if (name == null) {
+            return false;
+        }
+
+        int size = name.length();
+
+        if (size == 0) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            char c = name.charAt(i);
+
+            if ((!Character.isLetter(c) && c != '_') && (!Character.isDigit(c) || i == 0)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static int signumLt0(double a) {
         return a < 0 ? -1 : 0;
     }

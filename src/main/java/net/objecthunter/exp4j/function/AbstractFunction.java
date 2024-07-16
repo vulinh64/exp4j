@@ -16,12 +16,13 @@ public abstract class AbstractFunction implements Function {
         if (numArguments < 0) {
             throw new IllegalArgumentException(String.format("The number of function arguments can not be less than 0 for '%s'", name));
         }
-        if (!Function.isValidFunctionName(name)) {
+
+        if (!Functions.isValidFunctionName(name)) {
             throw new IllegalArgumentException(String.format("The function name '%s' is invalid", name));
         }
+
         this.name = name;
         this.numArguments = numArguments;
-
     }
 
     /**

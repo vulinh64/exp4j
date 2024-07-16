@@ -18,7 +18,12 @@ package net.objecthunter.exp4j.tokenizer;
 /**
  * Represents a number in the expression
  */
-public final class NumberToken extends Token {
+public final class NumberToken implements Token {
+
+    public static NumberToken of(final char[] expression, final int offset, final int len) {
+        return new NumberToken(Double.parseDouble(String.valueOf(expression, offset, len)));
+    }
+
     private final double value;
 
     /**
@@ -27,12 +32,7 @@ public final class NumberToken extends Token {
      * @param value the value of the number
      */
     public NumberToken(double value) {
-        super(TokenType.TOKEN_NUMBER);
         this.value = value;
-    }
-
-    NumberToken(final char[] expression, final int offset, final int len) {
-        this(Double.parseDouble(String.valueOf(expression, offset, len)));
     }
 
     /**
@@ -42,5 +42,11 @@ public final class NumberToken extends Token {
      */
     public double getValue() {
         return value;
+    }
+
+
+    @Override
+    public TokenType getType() {
+        return TokenType.TOKEN_NUMBER;
     }
 }

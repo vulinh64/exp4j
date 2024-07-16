@@ -60,7 +60,7 @@ public class ExpressionTest {
 
             @Override
             public double apply(double... args) {
-                final int arg = (int) args[0];
+                int arg = (int) args[0];
                 if ((double) arg != args[0]) {
                     throw new IllegalArgumentException("Operand for factorial has to be an integer");
                 }
@@ -166,11 +166,11 @@ public class ExpressionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testOperatorFactorial2() {
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
 
             @Override
             public double apply(double... args) {
-                final int arg = (int) args[0];
+                int arg = (int) args[0];
                 if ((double) arg != args[0]) {
                     throw new IllegalArgumentException("Operand for factorial has to be an integer");
                 }
@@ -191,11 +191,11 @@ public class ExpressionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFactorial2() {
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
 
             @Override
             public double apply(double... args) {
-                final int arg = (int) args[0];
+                int arg = (int) args[0];
                 if ((double) arg != args[0]) {
                     throw new IllegalArgumentException("Operand for factorial has to be an integer");
                 }
@@ -233,7 +233,7 @@ public class ExpressionTest {
         expression.clearVariables();
 
         try {
-            result = expression.evaluate();
+            expression.evaluate();
             fail("Should fail as there aren't values in the expression.");
         } catch (Exception ignored) {
 
@@ -243,7 +243,7 @@ public class ExpressionTest {
         expression.setVariables(emptyMap);
 
         try {
-            result = expression.evaluate();
+            expression.evaluate();
             fail("Should fail as there aren't values in the expression.");
         } catch (Exception ignored) {
 
@@ -253,26 +253,28 @@ public class ExpressionTest {
 
 
     @Test
-    @Ignore
+    @Ignore("unknown")
     // If Expression should be threads safe this test must pass
     public void evaluateFamily() {
-        final Expression e = new ExpressionBuilder("sin(x)")
+        Expression e = new ExpressionBuilder("sin(x)")
                 .variable("x")
                 .build();
-        try (ExecutorService executor = Executors.newFixedThreadPool(100)) {
-            for (int i = 0; i < 100000; i++) {
-                executor.execute(() -> {
-                    double x = Math.random();
-                    e.setVariable("x", x);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e1) {
-                        throw new RuntimeException("thread interrupted");
-                    }
-                    assertEquals(Math.sin(x), e.evaluate(), 0f);
-                });
-            }
+
+        ExecutorService executor = Executors.newFixedThreadPool(100);
+
+        for (int i = 0; i < 100000; i++) {
+            executor.execute(() -> {
+                double x = Math.random();
+                e.setVariable("x", x);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e1) {
+                    throw new RuntimeException("thread interrupted");
+                }
+                assertEquals(Math.sin(x), e.evaluate(), 0f);
+            });
         }
+
     }
 }
 

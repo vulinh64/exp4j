@@ -2,6 +2,9 @@ package net.objecthunter.exp4j.function;
 
 import java.util.function.DoubleUnaryOperator;
 
+/**
+ * Function that takes a single double operand
+ */
 public class UnaryFunction extends AbstractFunction {
 
     private final DoubleUnaryOperator function;
@@ -12,7 +15,7 @@ public class UnaryFunction extends AbstractFunction {
     }
 
     @Override
-    public double apply(double... args) {
-        return function.applyAsDouble(args[0]);
+    public double apply(double... operands) {
+        return function.applyAsDouble(operands[0]);
     }
 }

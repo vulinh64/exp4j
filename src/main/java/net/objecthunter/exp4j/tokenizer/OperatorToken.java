@@ -20,7 +20,8 @@ import net.objecthunter.exp4j.operator.Operator;
 /**
  * Represents an operator used in expressions
  */
-public class OperatorToken extends Token {
+public class OperatorToken implements Token {
+
     private final Operator operator;
 
     /**
@@ -29,10 +30,10 @@ public class OperatorToken extends Token {
      * @param op the operator
      */
     public OperatorToken(Operator op) {
-        super(TokenType.TOKEN_OPERATOR);
         if (op == null) {
             throw new IllegalArgumentException("Operator is unknown for token.");
         }
+
         this.operator = op;
     }
 
@@ -43,5 +44,10 @@ public class OperatorToken extends Token {
      */
     public Operator getOperator() {
         return operator;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.TOKEN_OPERATOR;
     }
 }

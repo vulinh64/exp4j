@@ -17,12 +17,17 @@ package net.objecthunter.exp4j.tokenizer;
 
 import net.objecthunter.exp4j.function.Function;
 
-public class FunctionToken extends Token {
+public class FunctionToken implements Token {
+
     private final Function function;
 
-    public FunctionToken(final Function function) {
-        super(TokenType.TOKEN_FUNCTION);
+    public FunctionToken(Function function) {
         this.function = function;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.TOKEN_FUNCTION;
     }
 
     public Function getFunction() {

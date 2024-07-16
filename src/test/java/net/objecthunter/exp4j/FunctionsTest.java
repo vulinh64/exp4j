@@ -17,6 +17,7 @@ package net.objecthunter.exp4j;
 
 import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
+import net.objecthunter.exp4j.function.Functions;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -24,7 +25,7 @@ import static org.junit.Assert.*;
 public class FunctionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameNull() {
-        Function f = new AbstractFunction(null) {
+        new AbstractFunction(null) {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -34,7 +35,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameEmpty() {
-        Function f = new AbstractFunction("") {
+        new AbstractFunction("") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -50,12 +51,13 @@ public class FunctionsTest {
                 return 0;
             }
         };
+
         assertEquals(0f, f.apply(), 0f);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameNegativeArgs() {
-        Function f = new AbstractFunction("foo", -1) {
+        new AbstractFunction("foo", -1) {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -65,7 +67,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName1() {
-        Function f = new AbstractFunction("1foo") {
+        new AbstractFunction("1foo") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -75,7 +77,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName2() {
-        Function f = new AbstractFunction("_&oo") {
+        new AbstractFunction("_&oo") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -85,7 +87,7 @@ public class FunctionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName3() {
-        Function f = new AbstractFunction("o+o") {
+        new AbstractFunction("o+o") {
             @Override
             public double apply(double... args) {
                 return 0;
@@ -95,29 +97,29 @@ public class FunctionsTest {
 
     @Test
     public void testCheckFunctionNames() {
-        assertTrue(Function.isValidFunctionName("log"));
-        assertTrue(Function.isValidFunctionName("sin"));
-        assertTrue(Function.isValidFunctionName("abz"));
-        assertTrue(Function.isValidFunctionName("alongfunctionnamecanhappen"));
-        assertTrue(Function.isValidFunctionName("_log"));
-        assertTrue(Function.isValidFunctionName("__blah"));
-        assertTrue(Function.isValidFunctionName("foox"));
-        assertTrue(Function.isValidFunctionName("aZ"));
-        assertTrue(Function.isValidFunctionName("Za"));
-        assertTrue(Function.isValidFunctionName("ZZaa"));
-        assertTrue(Function.isValidFunctionName("_"));
-        assertTrue(Function.isValidFunctionName("log2"));
-        assertTrue(Function.isValidFunctionName("lo32g2"));
-        assertTrue(Function.isValidFunctionName("_o45g2"));
+        assertTrue(Functions.isValidFunctionName("log"));
+        assertTrue(Functions.isValidFunctionName("sin"));
+        assertTrue(Functions.isValidFunctionName("abz"));
+        assertTrue(Functions.isValidFunctionName("alongfunctionnamecanhappen"));
+        assertTrue(Functions.isValidFunctionName("_log"));
+        assertTrue(Functions.isValidFunctionName("__blah"));
+        assertTrue(Functions.isValidFunctionName("foox"));
+        assertTrue(Functions.isValidFunctionName("aZ"));
+        assertTrue(Functions.isValidFunctionName("Za"));
+        assertTrue(Functions.isValidFunctionName("ZZaa"));
+        assertTrue(Functions.isValidFunctionName("_"));
+        assertTrue(Functions.isValidFunctionName("log2"));
+        assertTrue(Functions.isValidFunctionName("lo32g2"));
+        assertTrue(Functions.isValidFunctionName("_o45g2"));
 
-        assertFalse(Function.isValidFunctionName("&"));
-        assertFalse(Function.isValidFunctionName("_+log"));
-        assertFalse(Function.isValidFunctionName("_k&l"));
-        assertFalse(Function.isValidFunctionName("k&l"));
-        assertFalse(Function.isValidFunctionName("+log"));
-        assertFalse(Function.isValidFunctionName("fo-o"));
-        assertFalse(Function.isValidFunctionName("log+"));
-        assertFalse(Function.isValidFunctionName("perc%"));
-        assertFalse(Function.isValidFunctionName("del$a"));
+        assertFalse(Functions.isValidFunctionName("&"));
+        assertFalse(Functions.isValidFunctionName("_+log"));
+        assertFalse(Functions.isValidFunctionName("_k&l"));
+        assertFalse(Functions.isValidFunctionName("k&l"));
+        assertFalse(Functions.isValidFunctionName("+log"));
+        assertFalse(Functions.isValidFunctionName("fo-o"));
+        assertFalse(Functions.isValidFunctionName("log+"));
+        assertFalse(Functions.isValidFunctionName("perc%"));
+        assertFalse(Functions.isValidFunctionName("del$a"));
     }
 }

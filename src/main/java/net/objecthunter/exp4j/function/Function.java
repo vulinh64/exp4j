@@ -21,27 +21,6 @@ package net.objecthunter.exp4j.function;
  */
 public interface Function {
 
-    static boolean isValidFunctionName(final String name) {
-        if (name == null) {
-            return false;
-        }
-
-        final int size = name.length();
-
-        if (size == 0) {
-            return false;
-        }
-
-        for (int i = 0; i < size; i++) {
-            final char c = name.charAt(i);
-            if ((Character.isLetter(c) || c == '_') || Character.isDigit(c) && i > 0) {
-                continue;
-            }
-            return false;
-        }
-        return true;
-    }
-
     String getName();
 
     int getNumArguments();

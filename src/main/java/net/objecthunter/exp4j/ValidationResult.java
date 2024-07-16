@@ -57,4 +57,12 @@ public class ValidationResult {
      * A static class representing a successful validation result
      */
     public static final ValidationResult SUCCESS = new ValidationResult(true, null);
+
+    @Override
+    public String toString() {
+        return "ValidationResult{" +
+               "valid=" + valid +
+               ", errors=" + errors +
+               '}';
+    }
 }

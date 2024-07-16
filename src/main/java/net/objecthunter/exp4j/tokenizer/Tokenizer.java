@@ -15,6 +15,7 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
+import net.objecthunter.exp4j.exception.UnknownFunctionOrVariableException;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
 import net.objecthunter.exp4j.operator.Operator;
@@ -42,86 +43,102 @@ public class Tokenizer {
     private Token lastToken;
 
 
-    public Tokenizer(String expression, final Map<String, Function> userFunctions,
-                     final Map<String, Operator> userOperators, final Set<String> variableNames, final boolean implicitMultiplication) {
+    public Tokenizer(String expression, Map<String, Function> userFunctions,
+                     Map<String, Operator> userOperators, Set<String> variableNames, boolean implicitMultiplication) {
         this.expression = expression.trim().toCharArray();
-        this.expressionLength = this.expression.length;
+        expressionLength = this.expression.length;
         this.userFunctions = userFunctions;
         this.userOperators = userOperators;
         this.variableNames = variableNames;
         this.implicitMultiplication = implicitMultiplication;
     }
 
-    public Tokenizer(String expression, final Map<String, Function> userFunctions,
-                     final Map<String, Operator> userOperators, final Set<String> variableNames) {
+    public Tokenizer(String expression, Map<String, Function> userFunctions,
+                     Map<String, Operator> userOperators, Set<String> variableNames) {
         this.expression = expression.trim().toCharArray();
-        this.expressionLength = this.expression.length;
+        expressionLength = this.expression.length;
         this.userFunctions = userFunctions;
         this.userOperators = userOperators;
         this.variableNames = variableNames;
-        this.implicitMultiplication = true;
+        implicitMultiplication = true;
     }
 
     public boolean hasNext() {
-        return this.expression.length > pos;
+        return expression.length > pos;
     }
 
     public Token nextToken() {
         char ch = expression[pos];
+
         while (Character.isWhitespace(ch)) {
             ch = expression[++pos];
         }
-        if (Character.isDigit(ch) || ch == '.') {
-            if (lastToken != null) {
-                if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
-                    throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
-                } else if (implicitMultiplication && (lastToken.getType() != TokenType.TOKEN_OPERATOR
-                        && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-                        && lastToken.getType() != TokenType.TOKEN_FUNCTION
-                        && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
-                    // insert an implicit multiplication token
-                    lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-                    return lastToken;
-                }
-            }
-            return parseNumberToken(ch);
-        } else if (isArgumentSeparator(ch)) {
-            return parseArgumentSeparatorToken();
-        } else if (isOpenParentheses(ch)) {
-            if (lastToken != null && implicitMultiplication &&
-                    (lastToken.getType() != TokenType.TOKEN_OPERATOR
-                            && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-                            && lastToken.getType() != TokenType.TOKEN_FUNCTION
-                            && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
-                // insert an implicit multiplication token
-                lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-                return lastToken;
-            }
-            return parseParentheses(true);
-        } else if (isCloseParentheses(ch)) {
-            return parseParentheses(false);
-        } else if (Operator.isAllowedOperatorChar(ch)) {
-            return parseOperatorToken(ch);
-        } else if (isAlphabetic(ch) || ch == '_') {
-            // parse the name which can be a setVariable or a function
-            if (lastToken != null && implicitMultiplication &&
-                    (lastToken.getType() != TokenType.TOKEN_OPERATOR
-                            && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-                            && lastToken.getType() != TokenType.TOKEN_FUNCTION
-                            && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
-                // insert an implicit multiplication token
-                lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-                return lastToken;
-            }
-            return parseFunctionOrVariable();
 
+        if (Character.isDigit(ch) || ch == '.') {
+            return tokenWhenDigitOrDot(ch);
         }
+
+        if (isArgumentSeparator(ch)) {
+            return parseArgumentSeparatorToken();
+        }
+
+        if (isOpenParentheses(ch)) {
+            return tokenWhenParentheses(parseParentheses(true));
+        }
+
+        if (isCloseParentheses(ch)) {
+            return parseParentheses(false);
+        }
+
+        if (Operator.isAllowedOperatorChar(ch)) {
+            return parseOperatorToken(ch);
+        }
+
+        if (isAlphabetic(ch) || ch == '_') {
+            // parse the name which can be a setVariable or a function
+            return tokenWhenParentheses(parseFunctionOrVariable());
+        }
+
         throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
     }
 
+    private Token tokenWhenParentheses(Token parseParentheses) {
+        if (isNonOperandWithImplicitMultiplication(lastToken)) {
+            // insert an implicit multiplication token
+            lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+            return lastToken;
+        }
+
+        return parseParentheses;
+    }
+
+    private Token tokenWhenDigitOrDot(char ch) {
+        if (lastToken != null) {
+            if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
+                throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
+            }
+
+            if (isNonOperandWithImplicitMultiplication(lastToken)) {
+                // insert an implicit multiplication token
+                lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+                return lastToken;
+            }
+        }
+
+        return parseNumberToken(ch);
+    }
+
+    private boolean isNonOperandWithImplicitMultiplication(Token lastToken) {
+        return lastToken != null && implicitMultiplication &&
+               (lastToken.getType() != TokenType.TOKEN_OPERATOR
+                && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+                && lastToken.getType() != TokenType.TOKEN_FUNCTION
+                && lastToken.getType() != TokenType.TOKEN_SEPARATOR);
+    }
+
     private Token parseArgumentSeparatorToken() {
-        this.pos++;
-        this.lastToken = new ArgumentSeparatorToken();
+        pos++;
+        lastToken = NoArgsTokenEnum.ARGUMENT_SEPARATOR_TOKEN;
         return lastToken;
     }
 
@@ -129,13 +146,11 @@ public class Tokenizer {
         return ch == ',';
     }
 
-    private Token parseParentheses(final boolean open) {
-        if (open) {
-            this.lastToken = new OpenParenthesesToken();
-        } else {
-            this.lastToken = new CloseParenthesesToken();
-        }
-        this.pos++;
+    private Token parseParentheses(boolean open) {
+        lastToken = open ? NoArgsTokenEnum.OPEN_PARENTHESES_TOKEN : NoArgsTokenEnum.CLOSE_PARENTHESES_TOKEN;
+
+        pos++;
+
         return lastToken;
     }
 
@@ -148,23 +163,23 @@ public class Tokenizer {
     }
 
     private Token parseFunctionOrVariable() {
-        final int offset = this.pos;
+        int offset = pos;
         int testPos;
         int lastValidLen = 1;
         Token lastValidToken = null;
         int len = 1;
         if (isEndOfExpression(offset)) {
-            this.pos++;
+            pos++;
         }
         testPos = offset + len - 1;
         while (!isEndOfExpression(testPos) &&
-                isVariableOrFunctionCharacter(expression[testPos])) {
+               isVariableOrFunctionCharacter(expression[testPos])) {
             String name = new String(expression, offset, len);
             if (variableNames != null && variableNames.contains(name)) {
                 lastValidLen = len;
                 lastValidToken = new VariableToken(name);
             } else {
-                final Function f = getFunction(name);
+                Function f = getFunction(name);
                 if (f != null) {
                     lastValidLen = len;
                     lastValidToken = new FunctionToken(f);
@@ -183,8 +198,8 @@ public class Tokenizer {
 
     private Function getFunction(String name) {
         Function f = null;
-        if (this.userFunctions != null) {
-            f = this.userFunctions.get(name);
+        if (userFunctions != null) {
+            f = userFunctions.get(name);
         }
         if (f == null) {
             f = Functions.getBuiltinFunction(name);
@@ -193,9 +208,9 @@ public class Tokenizer {
     }
 
     private Token parseOperatorToken(char firstChar) {
-        final int offset = this.pos;
+        int offset = pos;
         int len = 1;
-        final StringBuilder symbol = new StringBuilder();
+        StringBuilder symbol = new StringBuilder();
         Operator lastValid = null;
         symbol.append(firstChar);
 
@@ -204,7 +219,7 @@ public class Tokenizer {
         }
 
         while (symbol.length() > 0) {
-            Operator op = this.getOperator(symbol.toString());
+            Operator op = getOperator(symbol.toString());
             if (op == null) {
                 symbol.setLength(symbol.length() - 1);
             } else {
@@ -220,43 +235,56 @@ public class Tokenizer {
 
     private Operator getOperator(String symbol) {
         Operator op = null;
-        if (this.userOperators != null) {
-            op = this.userOperators.get(symbol);
-        }
-        if (op == null && symbol.length() == 1) {
-            int argc = 2;
-            if (lastToken == null) {
-                argc = 1;
-            } else {
-                TokenType lastTokenType = lastToken.getType();
-                if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN || lastTokenType == TokenType.TOKEN_SEPARATOR) {
-                    argc = 1;
-                } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
-                    final Operator lastOp = ((OperatorToken) lastToken).getOperator();
-                    if (lastOp.getNumOperands() == 2 || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
-                        argc = 1;
-                    }
-                }
 
-            }
-            op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
+        if (userOperators != null) {
+            op = userOperators.get(symbol);
         }
+
+        if (op == null && symbol.length() == 1) {
+            op = parseOperatorWithNoOperatorAndLength1(symbol);
+        }
+
         return op;
     }
 
-    private Token parseNumberToken(final char firstChar) {
-        final int offset = this.pos;
+    private Operator parseOperatorWithNoOperatorAndLength1(String symbol) {
+        Operator op;
+        int argc = 2;
+
+        if (lastToken == null) {
+            argc = 1;
+        } else {
+            TokenType lastTokenType = lastToken.getType();
+
+            if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN || lastTokenType == TokenType.TOKEN_SEPARATOR) {
+                argc = 1;
+            } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
+                Operator lastOp = ((OperatorToken) lastToken).getOperator();
+
+                if (lastOp.getNumOperands() == 2 || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
+                    argc = 1;
+                }
+            }
+
+        }
+
+        op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
+        return op;
+    }
+
+    private Token parseNumberToken(char firstChar) {
+        int offset = pos;
         int len = 1;
-        this.pos++;
+        pos++;
         if (isEndOfExpression(offset + len)) {
             lastToken = new NumberToken(Double.parseDouble(String.valueOf(firstChar)));
             return lastToken;
         }
         while (!isEndOfExpression(offset + len) &&
-                isNumeric(expression[offset + len], expression[offset + len - 1] == 'e' ||
-                        expression[offset + len - 1] == 'E')) {
+               isNumeric(expression[offset + len], expression[offset + len - 1] == 'e' ||
+                                                   expression[offset + len - 1] == 'E')) {
             len++;
-            this.pos++;
+            pos++;
         }
         // check if the e is at the end
         if (expression[offset + len - 1] == 'e' || expression[offset + len - 1] == 'E') {
@@ -264,13 +292,13 @@ public class Tokenizer {
             len--;
             pos--;
         }
-        lastToken = new NumberToken(expression, offset, len);
+        lastToken = NumberToken.of(expression, offset, len);
         return lastToken;
     }
 
     private static boolean isNumeric(char ch, boolean lastCharE) {
         return Character.isDigit(ch) || ch == '.' || ch == 'e' || ch == 'E' ||
-                (lastCharE && (ch == '-' || ch == '+'));
+               (lastCharE && (ch == '-' || ch == '+'));
     }
 
     public static boolean isAlphabetic(int codePoint) {
@@ -279,12 +307,12 @@ public class Tokenizer {
 
     public static boolean isVariableOrFunctionCharacter(int codePoint) {
         return isAlphabetic(codePoint) ||
-                Character.isDigit(codePoint) ||
-                codePoint == '_' ||
-                codePoint == '.';
+               Character.isDigit(codePoint) ||
+               codePoint == '_' ||
+               codePoint == '.';
     }
 
     private boolean isEndOfExpression(int offset) {
-        return this.expressionLength <= offset;
+        return expressionLength <= offset;
     }
 }

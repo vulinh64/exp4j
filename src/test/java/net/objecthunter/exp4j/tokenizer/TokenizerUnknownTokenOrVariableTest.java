@@ -1,5 +1,6 @@
 package net.objecthunter.exp4j.tokenizer;
 
+import net.objecthunter.exp4j.exception.UnknownFunctionOrVariableException;
 import org.junit.Assert;
 import org.junit.Test;
 

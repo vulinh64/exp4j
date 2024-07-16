@@ -1,11 +1,13 @@
-package net.objecthunter.exp4j.tokenizer;
+package net.objecthunter.exp4j.exception;
+
+import net.objecthunter.exp4j.tokenizer.Tokenizer;
 
 /**
  * This exception is being thrown whenever {@link Tokenizer} finds unknown function or variable.
  *
  * @author Bartosz Firyn (sarxos)
  */
-class UnknownFunctionOrVariableException extends IllegalArgumentException {
+public class UnknownFunctionOrVariableException extends IllegalArgumentException {
 
     /**
      * Serial version UID.

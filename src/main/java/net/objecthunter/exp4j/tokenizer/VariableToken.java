@@ -18,7 +18,8 @@ package net.objecthunter.exp4j.tokenizer;
 /**
  * represents a setVariable used in an expression
  */
-public class VariableToken extends Token {
+public class VariableToken implements Token {
+
     private final String name;
 
     /**
@@ -36,7 +37,11 @@ public class VariableToken extends Token {
      * @param name the name of the setVariable
      */
     public VariableToken(String name) {
-        super(TokenType.TOKEN_VARIABLE);
         this.name = name;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.TOKEN_VARIABLE;
     }
 }
