@@ -62,9 +62,9 @@ public class Operators {
     public static Operator getBuiltinOperator(char symbol, int numArguments) {
         switch (symbol) {
             case '+':
-                return numArguments != 1 ? BinaryOperators.ADDITION : UnaryOperators.UNARY_PLUS;
+                return numArguments == 1 ? UnaryOperators.UNARY_PLUS : BinaryOperators.ADDITION;
             case '-':
-                return numArguments != 1 ? BinaryOperators.SUBTRACTION : UnaryOperators.UNARY_MINUS;
+                return numArguments == 1 ? UnaryOperators.UNARY_MINUS : BinaryOperators.SUBTRACTION;
             case '*':
                 return BinaryOperators.MULTIPLICATION;
             case '÷':

@@ -69,71 +69,55 @@ public class Tokenizer {
 
     public Token nextToken() {
         char ch = expression[pos];
-
         while (Character.isWhitespace(ch)) {
             ch = expression[++pos];
         }
-
         if (Character.isDigit(ch) || ch == '.') {
-            return tokenWhenDigitOrDot(ch);
-        }
-
-        if (isArgumentSeparator(ch)) {
-            return parseArgumentSeparatorToken();
-        }
-
-        if (isOpenParentheses(ch)) {
-            return tokenWhenParentheses(parseParentheses(true));
-        }
-
-        if (isCloseParentheses(ch)) {
-            return parseParentheses(false);
-        }
-
-        if (Operators.isAllowedOperatorChar(ch)) {
-            return parseOperatorToken(ch);
-        }
-
-        if (isAlphabetic(ch) || ch == '_') {
-            // parse the name which can be a setVariable or a function
-            return tokenWhenParentheses(parseFunctionOrVariable());
-        }
-
-        throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
-    }
-
-    private Token tokenWhenParentheses(Token parseParentheses) {
-        if (isNonOperandWithImplicitMultiplication(lastToken)) {
-            // insert an implicit multiplication token
-            lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-            return lastToken;
-        }
-
-        return parseParentheses;
-    }
-
-    private Token tokenWhenDigitOrDot(char ch) {
-        if (lastToken != null) {
-            if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
-                throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
+            if (lastToken != null) {
+                if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
+                    throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
+                } else if (implicitMultiplication && ((lastToken.getType() != TokenType.TOKEN_OPERATOR)
+                                                      && (lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN)
+                                                      && (lastToken.getType() != TokenType.TOKEN_FUNCTION)
+                                                      && (lastToken.getType() != TokenType.TOKEN_SEPARATOR))) {
+                    // insert an implicit multiplication token
+                    lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+                    return lastToken;
+                }
             }
-
-            if (isNonOperandWithImplicitMultiplication(lastToken)) {
+            return parseNumberToken(ch);
+        } else if (isArgumentSeparator(ch)) {
+            return parseArgumentSeparatorToken();
+        } else if (isOpenParentheses(ch)) {
+            if (lastToken != null && implicitMultiplication &&
+                (lastToken.getType() != TokenType.TOKEN_OPERATOR
+                 && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+                 && lastToken.getType() != TokenType.TOKEN_FUNCTION
+                 && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
                 // insert an implicit multiplication token
                 lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
                 return lastToken;
             }
+            return parseParentheses(true);
+        } else if (isCloseParentheses(ch)) {
+            return parseParentheses(false);
+        } else if (Operators.isAllowedOperatorChar(ch)) {
+            return parseOperatorToken(ch);
+        } else if (isAlphabetic(ch) || ch == '_') {
+            // parse the name which can be a setVariable or a function
+            if (lastToken != null && implicitMultiplication &&
+                (lastToken.getType() != TokenType.TOKEN_OPERATOR
+                 && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+                 && lastToken.getType() != TokenType.TOKEN_FUNCTION
+                 && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
+                // insert an implicit multiplication token
+                lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+                return lastToken;
+            }
+            return parseFunctionOrVariable();
+
         }
-
-        return parseNumberToken(ch);
-    }
-
-    private boolean isNonOperandWithImplicitMultiplication(Token lastToken) {
-        return lastToken != null && implicitMultiplication &&
-               (lastToken.getType() != TokenType.TOKEN_OPERATOR
-                && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-                && lastToken.getType() != TokenType.TOKEN_FUNCTION
-                && lastToken.getType() != TokenType.TOKEN_SEPARATOR);
+        throw new IllegalArgumentException("Unable to parse char '" + ch + "' (Code:" + (int) ch + ") at [" + pos + "]");
     }
 
     private Token parseArgumentSeparatorToken() {
@@ -147,10 +131,12 @@ public class Tokenizer {
     }
 
     private Token parseParentheses(boolean open) {
-        lastToken = open ? NoArgsTokenEnum.OPEN_PARENTHESES_TOKEN : NoArgsTokenEnum.CLOSE_PARENTHESES_TOKEN;
-
+        if (open) {
+            lastToken = NoArgsTokenEnum.OPEN_PARENTHESES_TOKEN;
+        } else {
+            lastToken = NoArgsTokenEnum.CLOSE_PARENTHESES_TOKEN;
+        }
         pos++;
-
         return lastToken;
     }
 
@@ -235,40 +221,27 @@ public class Tokenizer {
 
     private Operator getOperator(String symbol) {
         Operator op = null;
-
         if (userOperators != null) {
             op = userOperators.get(symbol);
         }
-
         if (op == null && symbol.length() == 1) {
-            op = parseOperatorWithNoOperatorAndLength1(symbol);
-        }
-
-        return op;
-    }
-
-    private Operator parseOperatorWithNoOperatorAndLength1(String symbol) {
-        Operator op;
-        int argc = 2;
-
-        if (lastToken == null) {
-            argc = 1;
-        } else {
-            TokenType lastTokenType = lastToken.getType();
-
-            if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN || lastTokenType == TokenType.TOKEN_SEPARATOR) {
+            int argc = 2;
+            if (lastToken == null) {
                 argc = 1;
-            } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
-                Operator lastOp = ((OperatorToken) lastToken).getOperator();
-
-                if (lastOp.getNumOperands() == 2 || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
+            } else {
+                TokenType lastTokenType = lastToken.getType();
+                if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN || lastTokenType == TokenType.TOKEN_SEPARATOR) {
                     argc = 1;
+                } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
+                    Operator lastOp = ((OperatorToken) lastToken).getOperator();
+                    if (lastOp.getNumOperands() == 2 || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
+                        argc = 1;
+                    }
                 }
+
             }
-
+            op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
         }
-
-        op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
         return op;
     }
 

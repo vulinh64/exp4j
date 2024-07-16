@@ -29,7 +29,7 @@ public class Functions {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 
-    private static final Map<String, Function> MAPS = Stream.concat(
+    private static final Map<String, Function> MAPS = Stream.<Function>concat(
                     Arrays.stream(UnaryFunctionEnum.values()),
                     Arrays.stream(BinaryFunctionEnum.values()))
             .collect(Collectors.toMap(Function::getName, java.util.function.Function.identity()));

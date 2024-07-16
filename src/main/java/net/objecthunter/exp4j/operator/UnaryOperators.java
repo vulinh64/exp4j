@@ -37,7 +37,7 @@ public enum UnaryOperators implements Operator {
 
     @Override
     public int getNumOperands() {
-        return 0;
+        return 1;
     }
 
     @Override
