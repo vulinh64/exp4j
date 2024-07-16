@@ -170,7 +170,7 @@ public class Expression {
     }
 
     public double evaluate() {
-        Deque<Double> output = new ArrayDeque<>();
+        ArrayStack output = new ArrayStack();
         for (Token t : tokens) {
             if (t.getType() == TokenType.TOKEN_NUMBER) {
                 output.push(((NumberToken) t).getValue());

@@ -57,7 +57,7 @@ public class ShuntingYard {
                     output.add(token);
                     break;
                 case TOKEN_FUNCTION:
-                    deque.add(token);
+                    deque.push(token); // Equivalent to stack.add
                     break;
                 case TOKEN_SEPARATOR:
                     while (!deque.isEmpty() && deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {

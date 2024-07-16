@@ -886,8 +886,7 @@ public class ExpressionBuilderTest {
                 .variables("x", "y")
                 .build()
                 .setVariable("x", varX)
-                .setVariable("y",
-                        varY);
+                .setVariable("y", varY);
         double result = e.evaluate();
         assertEquals(result, 7 * varX + 3 * varY - pow(log(varY / varX * 12), varY), 0.0);
     }
