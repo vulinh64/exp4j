@@ -34,13 +34,13 @@ public class Functions {
                     Arrays.stream(BinaryFunctionEnum.values()))
             .collect(Collectors.toMap(Function::getName, java.util.function.Function.identity()));
 
-    /**
-     * Get the builtin function for a given name
-     *
-     * @param name te name of the function
-     * @return a Function instance
-     */
-    public static Function getBuiltInFunction(String name) {
+  /**
+   * Get the builtin function for a given name
+   *
+   * @param name te name of the function
+   * @return a Function instance
+   */
+  public static Function getBuiltInFunction(String name) {
         return MAPS.get(name);
     }
 

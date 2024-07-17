@@ -26,266 +26,281 @@ import java.util.Set;
 
 public class Tokenizer {
 
-    private final char[] expression;
+  private final char[] expression;
 
-    private final int expressionLength;
+  private final int expressionLength;
 
-    private final Map<String, Function> userFunctions;
+  private final Map<String, Function> userFunctions;
 
-    private final Map<String, Operator> userOperators;
+  private final Map<String, Operator> userOperators;
 
-    private final Set<String> variableNames;
+  private final Set<String> variableNames;
 
-    private final boolean implicitMultiplication;
+  private final boolean implicitMultiplication;
 
-    private int pos = 0;
+  private int pos = 0;
 
-    private Token lastToken;
+  private Token lastToken;
 
+  public Tokenizer(
+      String expression,
+      Map<String, Function> userFunctions,
+      Map<String, Operator> userOperators,
+      Set<String> variableNames,
+      boolean implicitMultiplication) {
+    this.expression = expression.trim().toCharArray();
+    expressionLength = this.expression.length;
+    this.userFunctions = userFunctions;
+    this.userOperators = userOperators;
+    this.variableNames = variableNames;
+    this.implicitMultiplication = implicitMultiplication;
+  }
 
-    public Tokenizer(String expression, Map<String, Function> userFunctions,
-                     Map<String, Operator> userOperators, Set<String> variableNames, boolean implicitMultiplication) {
-        this.expression = expression.trim().toCharArray();
-        expressionLength = this.expression.length;
-        this.userFunctions = userFunctions;
-        this.userOperators = userOperators;
-        this.variableNames = variableNames;
-        this.implicitMultiplication = implicitMultiplication;
+  public Tokenizer(
+      String expression,
+      Map<String, Function> userFunctions,
+      Map<String, Operator> userOperators,
+      Set<String> variableNames) {
+    this.expression = expression.trim().toCharArray();
+    expressionLength = this.expression.length;
+    this.userFunctions = userFunctions;
+    this.userOperators = userOperators;
+    this.variableNames = variableNames;
+    implicitMultiplication = true;
+  }
+
+  public boolean hasNext() {
+    return expression.length > pos;
+  }
+
+  public Token nextToken() {
+    char ch = expression[pos];
+    while (Character.isWhitespace(ch)) {
+      ch = expression[++pos];
     }
-
-    public Tokenizer(String expression, Map<String, Function> userFunctions,
-                     Map<String, Operator> userOperators, Set<String> variableNames) {
-        this.expression = expression.trim().toCharArray();
-        expressionLength = this.expression.length;
-        this.userFunctions = userFunctions;
-        this.userOperators = userOperators;
-        this.variableNames = variableNames;
-        implicitMultiplication = true;
-    }
-
-    public boolean hasNext() {
-        return expression.length > pos;
-    }
-
-    public Token nextToken() {
-        char ch = expression[pos];
-        while (Character.isWhitespace(ch)) {
-            ch = expression[++pos];
+    if (Character.isDigit(ch) || ch == '.') {
+      if (lastToken != null) {
+        if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
+          throw new IllegalArgumentException(
+              String.format("Unable to parse char '%s' (Code:%s) at [%s]", ch, ch, pos));
+        } else if (implicitMultiplication
+            && ((lastToken.getType() != TokenType.TOKEN_OPERATOR)
+                && (lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN)
+                && (lastToken.getType() != TokenType.TOKEN_FUNCTION)
+                && (lastToken.getType() != TokenType.TOKEN_SEPARATOR))) {
+          // insert an implicit multiplication token
+          lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+          return lastToken;
         }
-        if (Character.isDigit(ch) || ch == '.') {
-            if (lastToken != null) {
-                if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
-                    throw new IllegalArgumentException(String.format("Unable to parse char '%s' (Code:%s) at [%s]", ch, ch, pos));
-                } else if (implicitMultiplication && ((lastToken.getType() != TokenType.TOKEN_OPERATOR)
-                                                      && (lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN)
-                                                      && (lastToken.getType() != TokenType.TOKEN_FUNCTION)
-                                                      && (lastToken.getType() != TokenType.TOKEN_SEPARATOR))) {
-                    // insert an implicit multiplication token
-                    lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-                    return lastToken;
-                }
-            }
-            return parseNumberToken(ch);
-        } else if (isArgumentSeparator(ch)) {
-            return parseArgumentSeparatorToken();
-        } else if (isOpenParentheses(ch)) {
-            if (lastToken != null && implicitMultiplication &&
-                (lastToken.getType() != TokenType.TOKEN_OPERATOR
-                 && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-                 && lastToken.getType() != TokenType.TOKEN_FUNCTION
-                 && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
-                // insert an implicit multiplication token
-                lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-                return lastToken;
-            }
-            return parseParentheses(true);
-        } else if (isCloseParentheses(ch)) {
-            return parseParentheses(false);
-        } else if (Operators.isAllowedOperatorChar(ch)) {
-            return parseOperatorToken(ch);
-        } else if (isAlphabetic(ch) || ch == '_') {
-            // parse the name which can be a setVariable or a function
-            if (lastToken != null && implicitMultiplication &&
-                (lastToken.getType() != TokenType.TOKEN_OPERATOR
-                 && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-                 && lastToken.getType() != TokenType.TOKEN_FUNCTION
-                 && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
-                // insert an implicit multiplication token
-                lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
-                return lastToken;
-            }
-            return parseFunctionOrVariable();
-
-        }
-        throw new IllegalArgumentException(String.format("Unable to parse char '%s' (Code:%s) at [%s]", ch, ch, pos));
-    }
-
-    private Token parseArgumentSeparatorToken() {
-        pos++;
-        lastToken = NoArgsTokenEnum.ARGUMENT_SEPARATOR_TOKEN;
+      }
+      return parseNumberToken(ch);
+    } else if (isArgumentSeparator(ch)) {
+      return parseArgumentSeparatorToken();
+    } else if (isOpenParentheses(ch)) {
+      if (lastToken != null
+          && implicitMultiplication
+          && (lastToken.getType() != TokenType.TOKEN_OPERATOR
+              && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+              && lastToken.getType() != TokenType.TOKEN_FUNCTION
+              && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
+        // insert an implicit multiplication token
+        lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
         return lastToken;
-    }
-
-    private boolean isArgumentSeparator(char ch) {
-        return ch == ',';
-    }
-
-    private Token parseParentheses(boolean open) {
-        if (open) {
-            lastToken = NoArgsTokenEnum.OPEN_PARENTHESES_TOKEN;
-        } else {
-            lastToken = NoArgsTokenEnum.CLOSE_PARENTHESES_TOKEN;
-        }
-        pos++;
+      }
+      return parseParentheses(true);
+    } else if (isCloseParentheses(ch)) {
+      return parseParentheses(false);
+    } else if (Operators.isAllowedOperatorChar(ch)) {
+      return parseOperatorToken(ch);
+    } else if (isAlphabetic(ch) || ch == '_') {
+      // parse the name which can be a setVariable or a function
+      if (lastToken != null
+          && implicitMultiplication
+          && (lastToken.getType() != TokenType.TOKEN_OPERATOR
+              && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
+              && lastToken.getType() != TokenType.TOKEN_FUNCTION
+              && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
+        // insert an implicit multiplication token
+        lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
         return lastToken;
+      }
+      return parseFunctionOrVariable();
+    }
+    throw new IllegalArgumentException(
+        String.format("Unable to parse char '%s' (Code:%s) at [%s]", ch, ch, pos));
+  }
+
+  private Token parseArgumentSeparatorToken() {
+    pos++;
+    lastToken = NoArgsTokenEnum.ARGUMENT_SEPARATOR_TOKEN;
+    return lastToken;
+  }
+
+  private boolean isArgumentSeparator(char ch) {
+    return ch == ',';
+  }
+
+  private Token parseParentheses(boolean open) {
+    if (open) {
+      lastToken = NoArgsTokenEnum.OPEN_PARENTHESES_TOKEN;
+    } else {
+      lastToken = NoArgsTokenEnum.CLOSE_PARENTHESES_TOKEN;
+    }
+    pos++;
+    return lastToken;
+  }
+
+  private boolean isOpenParentheses(char ch) {
+    return ch == '(' || ch == '{' || ch == '[';
+  }
+
+  private boolean isCloseParentheses(char ch) {
+    return ch == ')' || ch == '}' || ch == ']';
+  }
+
+  private Token parseFunctionOrVariable() {
+    int offset = pos;
+    int testPos;
+    int lastValidLen = 1;
+    Token lastValidToken = null;
+    int len = 1;
+    if (isEndOfExpression(offset)) {
+      pos++;
+    }
+    testPos = offset + len - 1;
+    while (!isEndOfExpression(testPos) && isVariableOrFunctionCharacter(expression[testPos])) {
+      String name = new String(expression, offset, len);
+      if (variableNames != null && variableNames.contains(name)) {
+        lastValidLen = len;
+        lastValidToken = new VariableToken(name);
+      } else {
+        Function f = getFunction(name);
+        if (f != null) {
+          lastValidLen = len;
+          lastValidToken = new FunctionToken(f);
+        }
+      }
+      len++;
+      testPos = offset + len - 1;
+    }
+    if (lastValidToken == null) {
+      throw new UnknownFunctionOrVariableException(new String(expression), pos, len);
+    }
+    pos += lastValidLen;
+    lastToken = lastValidToken;
+    return lastToken;
+  }
+
+  private Function getFunction(String name) {
+    Function f = null;
+    if (userFunctions != null) {
+      f = userFunctions.get(name);
+    }
+    if (f == null) {
+      f = Functions.getBuiltInFunction(name);
+    }
+    return f;
+  }
+
+  private Token parseOperatorToken(char firstChar) {
+    int offset = pos;
+    int len = 1;
+    StringBuilder symbol = new StringBuilder();
+    Operator lastValid = null;
+    symbol.append(firstChar);
+
+    while (!isEndOfExpression(offset + len)
+        && Operators.isAllowedOperatorChar(expression[offset + len])) {
+      symbol.append(expression[offset + len++]);
     }
 
-    private boolean isOpenParentheses(char ch) {
-        return ch == '(' || ch == '{' || ch == '[';
+    while (symbol.length() > 0) {
+      Operator op = getOperator(symbol.toString());
+      if (op == null) {
+        symbol.setLength(symbol.length() - 1);
+      } else {
+        lastValid = op;
+        break;
+      }
     }
 
-    private boolean isCloseParentheses(char ch) {
-        return ch == ')' || ch == '}' || ch == ']';
+    pos += symbol.length();
+    lastToken = new OperatorToken(lastValid);
+    return lastToken;
+  }
+
+  private Operator getOperator(String symbol) {
+    Operator op = null;
+    if (userOperators != null) {
+      op = userOperators.get(symbol);
     }
-
-    private Token parseFunctionOrVariable() {
-        int offset = pos;
-        int testPos;
-        int lastValidLen = 1;
-        Token lastValidToken = null;
-        int len = 1;
-        if (isEndOfExpression(offset)) {
-            pos++;
+    if (op == null && symbol.length() == 1) {
+      int argc = 2;
+      if (lastToken == null) {
+        argc = 1;
+      } else {
+        TokenType lastTokenType = lastToken.getType();
+        if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN
+            || lastTokenType == TokenType.TOKEN_SEPARATOR) {
+          argc = 1;
+        } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
+          Operator lastOp = ((OperatorToken) lastToken).getOperator();
+          if (lastOp.getNumOperands() == 2
+              || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
+            argc = 1;
+          }
         }
-        testPos = offset + len - 1;
-        while (!isEndOfExpression(testPos) &&
-               isVariableOrFunctionCharacter(expression[testPos])) {
-            String name = new String(expression, offset, len);
-            if (variableNames != null && variableNames.contains(name)) {
-                lastValidLen = len;
-                lastValidToken = new VariableToken(name);
-            } else {
-                Function f = getFunction(name);
-                if (f != null) {
-                    lastValidLen = len;
-                    lastValidToken = new FunctionToken(f);
-                }
-            }
-            len++;
-            testPos = offset + len - 1;
-        }
-        if (lastValidToken == null) {
-            throw new UnknownFunctionOrVariableException(new String(expression), pos, len);
-        }
-        pos += lastValidLen;
-        lastToken = lastValidToken;
-        return lastToken;
+      }
+      op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
     }
+    return op;
+  }
 
-    private Function getFunction(String name) {
-        Function f = null;
-        if (userFunctions != null) {
-            f = userFunctions.get(name);
-        }
-        if (f == null) {
-            f = Functions.getBuiltInFunction(name);
-        }
-        return f;
+  private Token parseNumberToken(char firstChar) {
+    int offset = pos;
+    int len = 1;
+    pos++;
+    if (isEndOfExpression(offset + len)) {
+      lastToken = new NumberToken(Double.parseDouble(String.valueOf(firstChar)));
+      return lastToken;
     }
-
-    private Token parseOperatorToken(char firstChar) {
-        int offset = pos;
-        int len = 1;
-        StringBuilder symbol = new StringBuilder();
-        Operator lastValid = null;
-        symbol.append(firstChar);
-
-        while (!isEndOfExpression(offset + len) && Operators.isAllowedOperatorChar(expression[offset + len])) {
-            symbol.append(expression[offset + len++]);
-        }
-
-        while (symbol.length() > 0) {
-            Operator op = getOperator(symbol.toString());
-            if (op == null) {
-                symbol.setLength(symbol.length() - 1);
-            } else {
-                lastValid = op;
-                break;
-            }
-        }
-
-        pos += symbol.length();
-        lastToken = new OperatorToken(lastValid);
-        return lastToken;
+    while (!isEndOfExpression(offset + len)
+        && isNumeric(
+            expression[offset + len],
+            expression[offset + len - 1] == 'e' || expression[offset + len - 1] == 'E')) {
+      len++;
+      pos++;
     }
-
-    private Operator getOperator(String symbol) {
-        Operator op = null;
-        if (userOperators != null) {
-            op = userOperators.get(symbol);
-        }
-        if (op == null && symbol.length() == 1) {
-            int argc = 2;
-            if (lastToken == null) {
-                argc = 1;
-            } else {
-                TokenType lastTokenType = lastToken.getType();
-                if (lastTokenType == TokenType.TOKEN_PARENTHESES_OPEN || lastTokenType == TokenType.TOKEN_SEPARATOR) {
-                    argc = 1;
-                } else if (lastTokenType == TokenType.TOKEN_OPERATOR) {
-                    Operator lastOp = ((OperatorToken) lastToken).getOperator();
-                    if (lastOp.getNumOperands() == 2 || (lastOp.getNumOperands() == 1 && !lastOp.isLeftAssociative())) {
-                        argc = 1;
-                    }
-                }
-
-            }
-            op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
-        }
-        return op;
+    // check if the e is at the end
+    if (expression[offset + len - 1] == 'e' || expression[offset + len - 1] == 'E') {
+      // since the e is at the end it's not part of the number and a rollback is necessary
+      len--;
+      pos--;
     }
+    lastToken = NumberToken.of(expression, offset, len);
+    return lastToken;
+  }
 
-    private Token parseNumberToken(char firstChar) {
-        int offset = pos;
-        int len = 1;
-        pos++;
-        if (isEndOfExpression(offset + len)) {
-            lastToken = new NumberToken(Double.parseDouble(String.valueOf(firstChar)));
-            return lastToken;
-        }
-        while (!isEndOfExpression(offset + len) &&
-               isNumeric(expression[offset + len], expression[offset + len - 1] == 'e' ||
-                                                   expression[offset + len - 1] == 'E')) {
-            len++;
-            pos++;
-        }
-        // check if the e is at the end
-        if (expression[offset + len - 1] == 'e' || expression[offset + len - 1] == 'E') {
-            // since the e is at the end it's not part of the number and a rollback is necessary
-            len--;
-            pos--;
-        }
-        lastToken = NumberToken.of(expression, offset, len);
-        return lastToken;
-    }
+  private static boolean isNumeric(char ch, boolean lastCharE) {
+    return Character.isDigit(ch)
+        || ch == '.'
+        || ch == 'e'
+        || ch == 'E'
+        || (lastCharE && (ch == '-' || ch == '+'));
+  }
 
-    private static boolean isNumeric(char ch, boolean lastCharE) {
-        return Character.isDigit(ch) || ch == '.' || ch == 'e' || ch == 'E' ||
-               (lastCharE && (ch == '-' || ch == '+'));
-    }
+  public static boolean isAlphabetic(int codePoint) {
+    return Character.isLetter(codePoint);
+  }
 
-    public static boolean isAlphabetic(int codePoint) {
-        return Character.isLetter(codePoint);
-    }
+  public static boolean isVariableOrFunctionCharacter(int codePoint) {
+    return isAlphabetic(codePoint)
+        || Character.isDigit(codePoint)
+        || codePoint == '_'
+        || codePoint == '.';
+  }
 
-    public static boolean isVariableOrFunctionCharacter(int codePoint) {
-        return isAlphabetic(codePoint) ||
-               Character.isDigit(codePoint) ||
-               codePoint == '_' ||
-               codePoint == '.';
-    }
-
-    private boolean isEndOfExpression(int offset) {
-        return expressionLength <= offset;
-    }
+  private boolean isEndOfExpression(int offset) {
+    return expressionLength <= offset;
+  }
 }

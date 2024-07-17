@@ -15,33 +15,31 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
-/**
- * represents a setVariable used in an expression
- */
+/** represents a setVariable used in an expression */
 public class VariableToken implements Token {
 
-    private final String name;
+  private final String name;
 
-    /**
-     * Get the name of the setVariable
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
+  /**
+   * Get the name of the setVariable
+   *
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Create a new instance
-     *
-     * @param name the name of the setVariable
-     */
-    public VariableToken(String name) {
-        this.name = name;
-    }
+  /**
+   * Create a new instance
+   *
+   * @param name the name of the setVariable
+   */
+  public VariableToken(String name) {
+    this.name = name;
+  }
 
-    @Override
-    public TokenType getType() {
-        return TokenType.TOKEN_VARIABLE;
-    }
+  @Override
+  public TokenType getType() {
+    return TokenType.TOKEN_VARIABLE;
+  }
 }

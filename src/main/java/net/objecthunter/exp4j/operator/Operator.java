@@ -15,18 +15,16 @@
  */
 package net.objecthunter.exp4j.operator;
 
-/**
- * Class representing operators that can be used in an expression
- */
+/** Class representing operators that can be used in an expression */
 public interface Operator {
 
-    boolean isLeftAssociative();
+  boolean isLeftAssociative();
 
-    int getPrecedence();
+  int getPrecedence();
 
-    String getSymbol();
+  String getSymbol();
 
-    int getNumOperands();
+  int getNumOperands();
 
-    double apply(double... doubles);
+  double apply(double... doubles);
 }

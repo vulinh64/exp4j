@@ -19,18 +19,18 @@ import net.objecthunter.exp4j.function.Function;
 
 public class FunctionToken implements Token {
 
-    private final Function function;
+  private final Function function;
 
-    public FunctionToken(Function function) {
-        this.function = function;
-    }
+  public FunctionToken(Function function) {
+    this.function = function;
+  }
 
-    @Override
-    public TokenType getType() {
-        return TokenType.TOKEN_FUNCTION;
-    }
+  @Override
+  public TokenType getType() {
+    return TokenType.TOKEN_FUNCTION;
+  }
 
-    public Function getFunction() {
-        return function;
-    }
+  public Function getFunction() {
+    return function;
+  }
 }

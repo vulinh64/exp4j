@@ -15,10 +15,8 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
-/**
- * Interface for tokens used by exp4j to tokenize expressions
- */
+/** Interface for tokens used by exp4j to tokenize expressions */
 public interface Token {
 
-    TokenType getType();
+  TokenType getType();
 }

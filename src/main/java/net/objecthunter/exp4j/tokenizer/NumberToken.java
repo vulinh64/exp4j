@@ -15,38 +15,35 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
-/**
- * Represents a number in the expression
- */
+/** Represents a number in the expression */
 public final class NumberToken implements Token {
 
-    public static NumberToken of(final char[] expression, final int offset, final int len) {
-        return new NumberToken(Double.parseDouble(String.valueOf(expression, offset, len)));
-    }
+  public static NumberToken of(final char[] expression, final int offset, final int len) {
+    return new NumberToken(Double.parseDouble(String.valueOf(expression, offset, len)));
+  }
 
-    private final double value;
+  private final double value;
 
-    /**
-     * Create a new instance
-     *
-     * @param value the value of the number
-     */
-    public NumberToken(double value) {
-        this.value = value;
-    }
+  /**
+   * Create a new instance
+   *
+   * @param value the value of the number
+   */
+  public NumberToken(double value) {
+    this.value = value;
+  }
 
-    /**
-     * Get the value of the number
-     *
-     * @return the value
-     */
-    public double getValue() {
-        return value;
-    }
+  /**
+   * Get the value of the number
+   *
+   * @return the value
+   */
+  public double getValue() {
+    return value;
+  }
 
-
-    @Override
-    public TokenType getType() {
-        return TokenType.TOKEN_NUMBER;
-    }
+  @Override
+  public TokenType getType() {
+    return TokenType.TOKEN_NUMBER;
+  }
 }

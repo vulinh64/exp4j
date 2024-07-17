@@ -17,37 +17,35 @@ package net.objecthunter.exp4j.tokenizer;
 
 import net.objecthunter.exp4j.operator.Operator;
 
-/**
- * Represents an operator used in expressions
- */
+/** Represents an operator used in expressions */
 public class OperatorToken implements Token {
 
-    private final Operator operator;
+  private final Operator operator;
 
-    /**
-     * Create a new instance
-     *
-     * @param op the operator
-     */
-    public OperatorToken(Operator op) {
-        if (op == null) {
-            throw new IllegalArgumentException("Operator is unknown for token");
-        }
-
-        this.operator = op;
+  /**
+   * Create a new instance
+   *
+   * @param op the operator
+   */
+  public OperatorToken(Operator op) {
+    if (op == null) {
+      throw new IllegalArgumentException("Operator is unknown for token");
     }
 
-    /**
-     * Get the operator for that token
-     *
-     * @return the operator
-     */
-    public Operator getOperator() {
-        return operator;
-    }
+    this.operator = op;
+  }
 
-    @Override
-    public TokenType getType() {
-        return TokenType.TOKEN_OPERATOR;
-    }
+  /**
+   * Get the operator for that token
+   *
+   * @return the operator
+   */
+  public Operator getOperator() {
+    return operator;
+  }
+
+  @Override
+  public TokenType getType() {
+    return TokenType.TOKEN_OPERATOR;
+  }
 }

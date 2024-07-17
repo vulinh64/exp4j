@@ -16,14 +16,12 @@
 
 package net.objecthunter.exp4j.function;
 
-/**
- * A class representing a Function which can be used in an expression
- */
+/** A class representing a Function which can be used in an expression */
 public interface Function {
 
-    String getName();
+  String getName();
 
-    int getNumArguments();
+  int getNumArguments();
 
-    double apply(double... args);
+  double apply(double... args);
 }
