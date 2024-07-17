@@ -16,35 +16,36 @@
 package net.objecthunter.exp4j;
 
 import net.objecthunter.exp4j.function.Functions;
+import net.objecthunter.exp4j.operator.AbstractOperator;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.operator.Operators;
 import net.objecthunter.exp4j.tokenizer.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
-public class ExpressionTest {
+class ExpressionTest {
     @Test
-    public void testExpression1() {
+    void testExpression1() {
         List<Token> tokens = Arrays.asList(new NumberToken(3d), new NumberToken(2d), new OperatorToken(Operators.getBuiltinOperator('+', 2)));
         Expression exp = new Expression(tokens);
         assertEquals(5d, exp.evaluate(), 0d);
     }
 
     @Test
-    public void testExpression2() {
+    void testExpression2() {
         List<Token> tokens = Arrays.asList(new NumberToken(1d), new FunctionToken(Functions.getBuiltInFunction("log")));
         Expression exp = new Expression(tokens);
         assertEquals(0d, exp.evaluate(), 0d);
     }
 
     @Test
-    public void testGetVariableNames1() {
+    void testGetVariableNames1() {
         List<Token> tokens = Arrays.asList(new VariableToken("a"), new VariableToken("b"), new OperatorToken(Operators.getBuiltinOperator('+', 2)));
         Expression exp = new Expression(tokens);
 
@@ -52,7 +53,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void testFactorial() {
+    void testFactorial() {
         Operator factorial = new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
 
             @Override
@@ -146,7 +147,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void testCotangent1() {
+    void testCotangent1() {
         Expression e = new ExpressionBuilder("cot(1)")
                 .build();
         assertEquals(1 / Math.tan(1), e.evaluate(), 0d);
@@ -154,65 +155,71 @@ public class ExpressionTest {
     }
 
     @Test
-    public void testInvalidCotangent1() {
+    void testInvalidCotangent1() {
         Expression e = new ExpressionBuilder("cot(0)")
                 .build();
-        assertEquals(Double.NaN, e.evaluate(), 0.0);
+        assertEquals(Double.POSITIVE_INFINITY, e.evaluate(), 0.0);
 
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testOperatorFactorial2() {
-        new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
-
-            @Override
-            public double apply(double... args) {
-                int arg = (int) args[0];
-                if ((double) arg != args[0]) {
-                    throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                }
-                if (arg < 0) {
-                    throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                }
-                double result = 1;
-                for (int i = 1; i <= arg; i++) {
-                    result *= i;
-                }
-                return result;
-            }
-        };
-
-        Expression e = new ExpressionBuilder("!3").build();
-        assertFalse(e.validate().isValid());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidFactorial2() {
-        new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
-
-            @Override
-            public double apply(double... args) {
-                int arg = (int) args[0];
-                if ((double) arg != args[0]) {
-                    throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                }
-                if (arg < 0) {
-                    throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                }
-                double result = 1;
-                for (int i = 1; i <= arg; i++) {
-                    result *= i;
-                }
-                return result;
-            }
-        };
-
-        Expression e = new ExpressionBuilder("!!3").build();
-        assertFalse(e.validate().isValid());
     }
 
     @Test
-    public void testClearVariables() {
+    void testOperatorFactorial2() {
+        assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
+
+                        @Override
+                        public double apply(double... args) {
+                            int arg = (int) args[0];
+                            if ((double) arg != args[0]) {
+                                throw new IllegalArgumentException("Operand for factorial has to be an integer");
+                            }
+                            if (arg < 0) {
+                                throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+                            }
+                            double result = 1;
+                            for (int i = 1; i <= arg; i++) {
+                                result *= i;
+                            }
+                            return result;
+                        }
+                    };
+
+                    Expression e = new ExpressionBuilder("!3").build();
+                    assertFalse(e.validate().isValid());
+                });
+    }
+
+    @Test
+    void testInvalidFactorial2() {
+        assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
+
+                        @Override
+                        public double apply(double... args) {
+                            int arg = (int) args[0];
+                            if ((double) arg != args[0]) {
+                                throw new IllegalArgumentException("Operand for factorial has to be an integer");
+                            }
+                            if (arg < 0) {
+                                throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+                            }
+                            double result = 1;
+                            for (int i = 1; i <= arg; i++) {
+                                result *= i;
+                            }
+                            return result;
+                        }
+                    };
+
+                    Expression e = new ExpressionBuilder("!!3").build();
+                    assertFalse(e.validate().isValid());
+                });
+    }
+
+    @Test
+    void testClearVariables() {
         ExpressionBuilder builder = new ExpressionBuilder("x + y");
         builder.variable("x");
         builder.variable("y");

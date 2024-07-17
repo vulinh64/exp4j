@@ -15,35 +15,39 @@
  */
 package net.objecthunter.exp4j;
 
+import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FunctionsTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void testFunctionNameNull() {
-        new AbstractFunction(null) {
-            @Override
-            public double apply(double... args) {
-                return 0;
-            }
-        };
-    }
+class FunctionsTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testFunctionNameEmpty() {
-        new AbstractFunction("") {
-            @Override
-            public double apply(double... args) {
-                return 0;
-            }
-        };
+    @Test
+    void testFunctionNameNull() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new AbstractFunction(null) {
+                    @Override
+                    public double apply(double... args) {
+                        return 0;
+                    }
+                });
     }
 
     @Test
-    public void testFunctionNameZeroArgs() {
+    void testFunctionNameEmpty() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new AbstractFunction("") {
+                    @Override
+                    public double apply(double... args) {
+                        return 0;
+                    }
+                });
+    }
+
+    @Test
+    void testFunctionNameZeroArgs() {
         Function f = new AbstractFunction("foo", 0) {
             @Override
             public double apply(double... args) {
@@ -54,48 +58,48 @@ public class FunctionsTest {
         assertEquals(0f, f.apply(), 0f);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testFunctionNameNegativeArgs() {
-        new AbstractFunction("foo", -1) {
+    @Test
+    void testFunctionNameNegativeArgs() {
+        assertThrows(IllegalArgumentException.class, () -> new AbstractFunction("foo", -1) {
             @Override
             public double apply(double... args) {
                 return 0;
             }
-        };
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegalFunctionName1() {
-        new AbstractFunction("1foo") {
-            @Override
-            public double apply(double... args) {
-                return 0;
-            }
-        };
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegalFunctionName2() {
-        new AbstractFunction("_&oo") {
-            @Override
-            public double apply(double... args) {
-                return 0;
-            }
-        };
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegalFunctionName3() {
-        new AbstractFunction("o+o") {
-            @Override
-            public double apply(double... args) {
-                return 0;
-            }
-        };
+        });
     }
 
     @Test
-    public void testCheckFunctionNames() {
+    void testIllegalFunctionName1() {
+        assertThrows(IllegalArgumentException.class, () -> new AbstractFunction("1foo") {
+            @Override
+            public double apply(double... args) {
+                return 0;
+            }
+        });
+    }
+
+    @Test
+    void testIllegalFunctionName2() {
+        assertThrows(IllegalArgumentException.class, () -> new AbstractFunction("_&oo") {
+            @Override
+            public double apply(double... args) {
+                return 0;
+            }
+        });
+    }
+
+    @Test
+    void testIllegalFunctionName3() {
+        assertThrows(IllegalArgumentException.class, () -> new AbstractFunction("o+o") {
+            @Override
+            public double apply(double... args) {
+                return 0;
+            }
+        });
+    }
+
+    @Test
+    void testCheckFunctionNames() {
         assertTrue(Functions.isValidFunctionName("log"));
         assertTrue(Functions.isValidFunctionName("sin"));
         assertTrue(Functions.isValidFunctionName("abz"));

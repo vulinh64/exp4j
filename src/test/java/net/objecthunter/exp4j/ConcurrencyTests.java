@@ -15,25 +15,25 @@
  */
 package net.objecthunter.exp4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConcurrencyTests {
+class ConcurrencyTests {
 
     @Test
-    public void testFutureEvaluation() throws Exception {
+    void testFutureEvaluation() throws Exception {
         ExecutorService exec = Executors.newFixedThreadPool(10);
         int numTests = 10000;
         double[] correct1 = new double[numTests];
-        Future[] results1 = new Future[numTests];
+        Future<?>[] results1 = new Future[numTests];
 
         double[] correct2 = new double[numTests];
-        Future[] results2 = new Future[numTests];
+        Future<?>[] results2 = new Future[numTests];
 
         for (int i = 0; i < numTests; i++) {
             correct1[i] = Math.sin(2 * Math.PI / (i + 1));

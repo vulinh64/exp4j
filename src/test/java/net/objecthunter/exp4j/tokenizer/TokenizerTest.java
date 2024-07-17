@@ -15,41 +15,41 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
-import net.objecthunter.exp4j.AbstractFunction;
-import net.objecthunter.exp4j.AbstractOperator;
+import net.objecthunter.exp4j.function.AbstractFunction;
+import net.objecthunter.exp4j.operator.AbstractOperator;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.operator.Operators;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static net.objecthunter.exp4j.TestUtil.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TokenizerTest {
+class TokenizerTest {
 
     @Test
-    public void testTokenization1() {
+    void testTokenization1() {
         Tokenizer tokenizer = new Tokenizer("1.222331", null, null, null);
         assertNumberToken(tokenizer.nextToken(), 1.222331d);
     }
 
     @Test
-    public void testTokenization2() {
+    void testTokenization2() {
         Tokenizer tokenizer = new Tokenizer(".222331", null, null, null);
         assertNumberToken(tokenizer.nextToken(), .222331d);
     }
 
     @Test
-    public void testTokenization3() {
+    void testTokenization3() {
         Tokenizer tokenizer = new Tokenizer("3e2", null, null, null);
         assertNumberToken(tokenizer.nextToken(), 300d);
     }
 
     @Test
-    public void testTokenization4() {
+    void testTokenization4() {
         Tokenizer tokenizer = new Tokenizer("3+1", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -65,7 +65,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization5() {
+    void testTokenization5() {
         Tokenizer tokenizer = new Tokenizer("+3", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -78,7 +78,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization6() {
+    void testTokenization6() {
         Tokenizer tokenizer = new Tokenizer("-3", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -91,7 +91,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization7() {
+    void testTokenization7() {
         Tokenizer tokenizer = new Tokenizer("---++-3", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -119,7 +119,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization8() {
+    void testTokenization8() {
         Tokenizer tokenizer = new Tokenizer("---++-3.004", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -147,7 +147,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization9() {
+    void testTokenization9() {
         Tokenizer tokenizer = new Tokenizer("3+-1", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -166,7 +166,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization10() {
+    void testTokenization10() {
         Tokenizer tokenizer = new Tokenizer("3+-1-.32++2", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -200,7 +200,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization11() {
+    void testTokenization11() {
         Tokenizer tokenizer = new Tokenizer("2+", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -213,7 +213,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization12() {
+    void testTokenization12() {
         Tokenizer tokenizer = new Tokenizer("log(1)", null, null, null);
 
         assertTrue(tokenizer.hasNext());
@@ -232,7 +232,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization13() {
+    void testTokenization13() {
         Tokenizer tokenizer = new Tokenizer("x", null, null, new HashSet<>(Collections.singletonList("x")));
 
         assertTrue(tokenizer.hasNext());
@@ -242,7 +242,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization14() {
+    void testTokenization14() {
         Tokenizer tokenizer = new Tokenizer("2*x-log(3)", null, null, new HashSet<>(Collections.singletonList("x")));
 
         assertTrue(tokenizer.hasNext());
@@ -273,7 +273,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization15() {
+    void testTokenization15() {
         Tokenizer tokenizer = new Tokenizer("2*xlog+log(3)", null, null, new HashSet<>(Collections.singletonList("xlog")));
 
         assertTrue(tokenizer.hasNext());
@@ -304,7 +304,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization16() {
+    void testTokenization16() {
         Tokenizer tokenizer = new Tokenizer("2*x+-log(3)", null, null, new HashSet<>(Collections.singletonList("x")));
 
         assertTrue(tokenizer.hasNext());
@@ -338,7 +338,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization17() {
+    void testTokenization17() {
         Tokenizer tokenizer = new Tokenizer("2 * x + -log(3)", null, null, new HashSet<>(Collections.singletonList("x")));
 
         assertTrue(tokenizer.hasNext());
@@ -372,7 +372,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization18() {
+    void testTokenization18() {
         Function log2 = new AbstractFunction("log2") {
 
             @Override
@@ -401,7 +401,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization19() {
+    void testTokenization19() {
         Function avg = new AbstractFunction("avg", 2) {
 
             @Override
@@ -439,7 +439,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization20() {
+    void testTokenization20() {
         Operator factorial = new AbstractOperator("!", 1, true, Operators.PRECEDENCE_POWER + 1) {
             @Override
             public double apply(double... args) {
@@ -461,7 +461,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization21() {
+    void testTokenization21() {
         Tokenizer tokenizer = new Tokenizer("log(x) - y * (sqrt(x^cos(y)))", null, null, new HashSet<>(Arrays.asList("x", "y")));
 
         assertTrue(tokenizer.hasNext());
@@ -522,7 +522,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void testTokenization22() {
+    void testTokenization22() {
         Tokenizer tokenizer = new Tokenizer("--2 * (-14)", null, null, null);
 
         assertTrue(tokenizer.hasNext());

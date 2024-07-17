@@ -15,27 +15,27 @@
  */
 package net.objecthunter.exp4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.EmptyStackException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Federico Vera (dktcoding [at] gmail)
  */
-public class ArrayStackTest {
+class ArrayStackTest {
 
     public ArrayStackTest() {
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructor() {
-        ArrayStack stack = new ArrayStack(-1);
+    @Test
+    void testConstructor() {
+        assertThrows(IllegalArgumentException.class, () -> new ArrayStack(-1));
     }
 
     @Test
-    public void testPushNoSize() {
+    void testPushNoSize() {
         ArrayStack stack = new ArrayStack();
 
         stack.push(0);
@@ -46,7 +46,7 @@ public class ArrayStackTest {
     }
 
     @Test
-    public void testPushLessSize() {
+    void testPushLessSize() {
         ArrayStack stack = new ArrayStack(5);
 
         for (int i = 0; i < 5; i++) {
@@ -57,7 +57,7 @@ public class ArrayStackTest {
     }
 
     @Test
-    public void testPeek() {
+    void testPeek() {
         ArrayStack stack = new ArrayStack(5);
 
         for (int i = 0; i < 5; i++) {
@@ -70,7 +70,7 @@ public class ArrayStackTest {
     }
 
     @Test
-    public void testPeek2() {
+    void testPeek2() {
         ArrayStack stack = new ArrayStack(5);
         stack.push(-1);
         double old = -1;
@@ -82,14 +82,16 @@ public class ArrayStackTest {
         }
     }
 
-    @Test(expected = EmptyStackException.class)
-    public void testPeekNoData() {
-        ArrayStack stack = new ArrayStack(5);
-        stack.peek();
+    @Test
+    void testPeekNoData() {
+        assertThrows(EmptyStackException.class, () -> {
+            ArrayStack stack = new ArrayStack(5);
+            stack.peek();
+        });
     }
 
     @Test
-    public void testPop() {
+    void testPop() {
         ArrayStack stack = new ArrayStack(5);
 
         for (int i = 0; i < 5; i++) {
@@ -99,23 +101,27 @@ public class ArrayStackTest {
         while (!stack.isEmpty()) {
             stack.pop();
         }
+
+        assertNotNull(stack);
     }
 
-    @Test(expected = EmptyStackException.class)
-    public void testPop2() {
+    @Test
+    void testPop2() {
         ArrayStack stack = new ArrayStack(5);
 
         for (int i = 0; i < 5; i++) {
             stack.push(i);
         }
 
-        while (true) {
-            stack.pop();
-        }
+        assertThrows(EmptyStackException.class, () -> {
+            while (true) {
+                stack.pop();
+            }
+        });
     }
 
     @Test
-    public void testPop3() {
+    void testPop3() {
         ArrayStack stack = new ArrayStack(5);
 
         for (int i = 0; i < 5; i++) {
@@ -128,14 +134,16 @@ public class ArrayStackTest {
         assertTrue(stack.isEmpty());
     }
 
-    @Test(expected = EmptyStackException.class)
-    public void testPopNoData() {
-        ArrayStack stack = new ArrayStack(5);
-        stack.pop();
+    @Test
+    void testPopNoData() {
+        assertThrows(EmptyStackException.class, () -> {
+            ArrayStack stack = new ArrayStack(5);
+            stack.pop();
+        });
     }
 
     @Test
-    public void testIsEmpty() {
+    void testIsEmpty() {
         ArrayStack stack = new ArrayStack(5);
         assertTrue(stack.isEmpty());
         stack.push(4);
@@ -157,7 +165,7 @@ public class ArrayStackTest {
     }
 
     @Test
-    public void testSize() {
+    void testSize() {
         ArrayStack stack = new ArrayStack(5);
         assertEquals(0, stack.size());
         stack.push(4);

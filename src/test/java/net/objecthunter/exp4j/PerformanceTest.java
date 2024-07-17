@@ -15,26 +15,26 @@
  */
 package net.objecthunter.exp4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.util.Formatter;
 import java.util.Random;
 
-public class PerformanceTest {
+class PerformanceTest {
 
     private static final long BENCH_TIME = 2L;
     private static final String EXPRESSION = "log(x) - y * (sqrt(x^cos(y)))";
 
     @Test
-    public void testBenches() throws Exception {
+    void testBenches() throws Exception {
         StringBuffer sb = new StringBuffer();
         Formatter fmt = new Formatter(sb);
         fmt.format("+------------------------+---------------------------+--------------------------+%n");
         fmt.format("| %-22s | %-25s | %-24s |%n", "Implementation", "Calculations per Second", "Percentage of Math");
         fmt.format("+------------------------+---------------------------+--------------------------+%n");
-        System.out.print(sb.toString());
+        System.out.print(sb);
         sb.setLength(0);
 
         int math = benchJavaMath();
@@ -60,7 +60,6 @@ public class PerformanceTest {
         final Expression expression = new ExpressionBuilder(EXPRESSION)
                 .variables("x", "y")
                 .build();
-        double val;
         Random rnd = new Random();
         long timeout = BENCH_TIME;
         long time = System.currentTimeMillis() + (1000 * timeout);
@@ -68,16 +67,15 @@ public class PerformanceTest {
         while (time > System.currentTimeMillis()) {
             expression.setVariable("x", rnd.nextDouble());
             expression.setVariable("y", rnd.nextDouble());
-            val = expression.evaluate();
+            expression.evaluate();
             count++;
         }
-        double rate = count / timeout;
         return count;
     }
 
     private int benchJavaMath() {
         long time = System.currentTimeMillis() + (1000 * BENCH_TIME);
-        double x, y, val, rate;
+        double x, y, val;
         int count = 0;
         Random rnd = new Random();
         while (time > System.currentTimeMillis()) {
@@ -92,23 +90,21 @@ public class PerformanceTest {
     private int benchJavaScript() throws Exception {
         ScriptEngineManager mgr = new ScriptEngineManager();
         ScriptEngine engine = mgr.getEngineByName("JavaScript");
-        long timeout = BENCH_TIME;
         long time;
-        double x, y, val, rate;
+        double x, y, val;
         int count = 0;
         Random rnd = new Random();
         if (engine == null) {
             System.err.println("Unable to instantiate javascript engine. skipping naive JS bench.");
             return -1;
         } else {
-            time = System.currentTimeMillis() + (1000 * timeout);
+            time = System.currentTimeMillis() + (1000 * BENCH_TIME);
             while (time > System.currentTimeMillis()) {
                 x = rnd.nextDouble();
                 y = rnd.nextDouble();
                 engine.eval("Math.log(" + x + ") - " + y + "* (Math.sqrt(" + x + "^Math.cos(" + y + ")))");
                 count++;
             }
-            rate = count / timeout;
         }
         return count;
     }

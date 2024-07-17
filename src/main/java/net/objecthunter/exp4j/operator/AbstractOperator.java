@@ -1,6 +1,4 @@
-package net.objecthunter.exp4j;
-
-import net.objecthunter.exp4j.operator.Operator;
+package net.objecthunter.exp4j.operator;
 
 public class AbstractOperator implements Operator {
 

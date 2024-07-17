@@ -15,16 +15,16 @@
  */
 package net.objecthunter.exp4j;
 
+import net.objecthunter.exp4j.function.AbstractFunction;
 import net.objecthunter.exp4j.function.Function;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-public class ExpressionValidateTest {
+class ExpressionValidateTest {
 
     /**
      * Dummy function with 2 arguments.
@@ -55,230 +55,230 @@ public class ExpressionValidateTest {
 
         @Override
         public double apply(double... args) {
-            double eta = 0;
+            double x = 0;
             for (double a : args) {
-                eta += a;
+                x += a;
             }
-            return eta;
+            return x;
         }
     };
 
     // valid scenarios
 
     @Test
-    public void testValidateNumber() {
+    void testValidateNumber() {
         Expression exp = new ExpressionBuilder("1")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateNumberPositive() {
+    void testValidateNumberPositive() {
         Expression exp = new ExpressionBuilder("+1")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateNumberNegative() {
+    void testValidateNumberNegative() {
         Expression exp = new ExpressionBuilder("-1")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateOperator() {
+    void testValidateOperator() {
         Expression exp = new ExpressionBuilder("x + 1 + 2")
                 .variable("x")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunction() {
+    void testValidateFunction() {
         Expression exp = new ExpressionBuilder("sin(x)")
                 .variable("x")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionPositive() {
+    void testValidateFunctionPositive() {
         Expression exp = new ExpressionBuilder("+sin(x)")
                 .variable("x")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionNegative() {
+    void testValidateFunctionNegative() {
         Expression exp = new ExpressionBuilder("-sin(x)")
                 .variable("x")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionAndOperator() {
+    void testValidateFunctionAndOperator() {
         Expression exp = new ExpressionBuilder("sin(x + 1 + 2)")
                 .variable("x")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithTwoArguments() {
+    void testValidateFunctionWithTwoArguments() {
         Expression exp = new ExpressionBuilder("beta(x, y)")
                 .variables("x", "y")
                 .functions(beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithTwoArgumentsAndOperator() {
+    void testValidateFunctionWithTwoArgumentsAndOperator() {
         Expression exp = new ExpressionBuilder("beta(x, y + 1)")
                 .variables("x", "y")
                 .functions(beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithThreeArguments() {
+    void testValidateFunctionWithThreeArguments() {
         Expression exp = new ExpressionBuilder("gamma(x, y, z)")
                 .variables("x", "y", "z")
                 .functions(gamma)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithThreeArgumentsAndOperator() {
+    void testValidateFunctionWithThreeArgumentsAndOperator() {
         Expression exp = new ExpressionBuilder("gamma(x, y, z + 1)")
                 .variables("x", "y", "z")
                 .functions(gamma)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithTwoAndThreeArguments() {
+    void testValidateFunctionWithTwoAndThreeArguments() {
         Expression exp = new ExpressionBuilder("gamma(x, beta(y, h), z)")
                 .variables("x", "y", "z", "h")
                 .functions(gamma, beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithTwoAndThreeArgumentsAndOperator() {
+    void testValidateFunctionWithTwoAndThreeArgumentsAndOperator() {
         Expression exp = new ExpressionBuilder("gamma(x, beta(y, h), z + 1)")
                 .variables("x", "y", "z", "h")
                 .functions(gamma, beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithTwoAndThreeArgumentsAndMultipleOperator() {
+    void testValidateFunctionWithTwoAndThreeArgumentsAndMultipleOperator() {
         Expression exp = new ExpressionBuilder("gamma(x * 2 / 4, beta(y, h + 1 + 2), z + 1 + 2 + 3 + 4)")
                 .variables("x", "y", "z", "h")
                 .functions(gamma, beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithSevenArguments() {
+    void testValidateFunctionWithSevenArguments() {
         Expression exp = new ExpressionBuilder("eta(1, 2, 3, 4, 5, 6, 7)")
                 .functions(eta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
-    public void testValidateFunctionWithSevenArgumentsAndOperator() {
+    void testValidateFunctionWithSevenArgumentsAndOperator() {
         Expression exp = new ExpressionBuilder("eta(1, 2, 3, 4, 5, 6, 7) * 2 * 3 * 4")
                 .functions(eta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertTrue(result.isValid());
+        assertTrue(result.isValid());
     }
 
     // invalid scenarios
 
     @Test
-    public void testValidateInvalidFunction() {
+    void testValidateInvalidFunction() {
         Expression exp = new ExpressionBuilder("sin()")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertFalse(result.isValid());
+        assertFalse(result.isValid());
     }
 
     @Test
-    public void testValidateInvalidOperand() {
+    void testValidateInvalidOperand() {
         Expression exp = new ExpressionBuilder("1 + ")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertFalse(result.isValid());
+        assertFalse(result.isValid());
     }
 
     @Test
-    public void testValidateInvalidFunctionWithTooFewArguments() {
+    void testValidateInvalidFunctionWithTooFewArguments() {
         Expression exp = new ExpressionBuilder("beta(1)")
                 .functions(beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertFalse(result.isValid());
+        assertFalse(result.isValid());
     }
 
     @Test
-    public void testValidateInvalidFunctionWithTooFewArgumentsAndOperands() {
+    void testValidateInvalidFunctionWithTooFewArgumentsAndOperands() {
         Expression exp = new ExpressionBuilder("beta(1 + )")
                 .functions(beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertFalse(result.isValid());
+        assertFalse(result.isValid());
     }
 
     @Test
-    public void testValidateInvalidFunctionWithManyArguments() {
+    void testValidateInvalidFunctionWithManyArguments() {
         Expression exp = new ExpressionBuilder("beta(1, 2, 3)")
                 .functions(beta)
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertFalse(result.isValid());
+        assertFalse(result.isValid());
     }
 
     @Test
-    public void testValidateInvalidOperator() {
+    void testValidateInvalidOperator() {
         Expression exp = new ExpressionBuilder("+")
                 .build();
         ValidationResult result = exp.validate(false);
-        Assert.assertFalse(result.isValid());
+        assertFalse(result.isValid());
     }
 
     // Thanks go out to werwiesel for reporting the issue
     // https://github.com/fasseg/exp4j/issues/59
     @Test
-    public void testNoArgFunctionValidation() {
+    void testNoArgFunctionValidation() {
         Function now = new AbstractFunction("now", 0) {
             @Override
             public double apply(double... args) {
