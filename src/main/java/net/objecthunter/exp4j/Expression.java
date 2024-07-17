@@ -178,13 +178,13 @@ public class Expression {
                 String name = ((VariableToken) t).getName();
                 Double value = variables.get(name);
                 if (value == null) {
-                    throw new IllegalArgumentException("No value has been set for the setVariable '" + name + "'.");
+                    throw new IllegalArgumentException(String.format("No value has been set for the setVariable '%s'.", name));
                 }
                 output.push(value);
             } else if (t.getType() == TokenType.TOKEN_OPERATOR) {
                 OperatorToken op = (OperatorToken) t;
                 if (output.size() < op.getOperator().getNumOperands()) {
-                    throw new IllegalArgumentException("Invalid number of operands available for '" + op.getOperator().getSymbol() + "' operator");
+                    throw new IllegalArgumentException(String.format("Invalid number of operands available for '%s' operator", op.getOperator().getSymbol()));
                 }
                 if (op.getOperator().getNumOperands() == 2) {
                     /* pop the operands and push the result of the operation */
@@ -200,7 +200,7 @@ public class Expression {
                 FunctionToken func = (FunctionToken) t;
                 int numArguments = func.getFunction().getNumArguments();
                 if (output.size() < numArguments) {
-                    throw new IllegalArgumentException("Invalid number of arguments available for '" + func.getFunction().getName() + "' function");
+                    throw new IllegalArgumentException(String.format("Invalid number of arguments available for '%s' function", func.getFunction().getName()));
                 }
                 /* collect the arguments from the stack */
                 double[] args = new double[numArguments];

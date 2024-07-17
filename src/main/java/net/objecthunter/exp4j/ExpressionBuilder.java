@@ -196,7 +196,7 @@ public class ExpressionBuilder {
         /* Check if there are duplicate vars/functions */
         for (String v : variableNames) {
             if (Functions.getBuiltInFunction(v) != null || userFunctions.containsKey(v)) {
-                throw new IllegalArgumentException("A variable can not have the same name as a function [" + v + "]");
+                throw new IllegalArgumentException(String.format("A variable can not have the same name as a function [%s]", v));
             }
         }
 

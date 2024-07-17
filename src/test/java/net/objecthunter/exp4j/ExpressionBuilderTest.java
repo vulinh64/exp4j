@@ -842,14 +842,11 @@ class ExpressionBuilderTest {
 
     @Test
     void testInvalidFunction1() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new AbstractFunction("1gd") {
-
-                @Override
-                public double apply(double... args) {
-                    return 0;
-                }
-            };
+        assertThrows(IllegalArgumentException.class, () -> new AbstractFunction("1gd") {
+            @Override
+            public double apply(double... args) {
+                return 0;
+            }
         });
     }
 
@@ -2837,27 +2834,23 @@ class ExpressionBuilderTest {
     @Test
     void testSameVariableAndBuiltinFunctionName() {
         assertThrows(IllegalArgumentException.class,
-                () -> {
-                    new ExpressionBuilder("log10(log10)")
-                            .variables("log10")
-                            .build();
-                });
+                () -> new ExpressionBuilder("log10(log10)")
+                        .variables("log10")
+                        .build());
     }
 
     @Test
     void testSameVariableAndUserFunctionName() {
         assertThrows(IllegalArgumentException.class,
-                () -> {
-                    new ExpressionBuilder("2*tr+tr(2)")
-                            .variables("tr")
-                            .function(new AbstractFunction("tr") {
-                                @Override
-                                public double apply(double... args) {
-                                    return 0;
-                                }
-                            })
-                            .build();
-                });
+                () -> new ExpressionBuilder("2*tr+tr(2)")
+                        .variables("tr")
+                        .function(new AbstractFunction("tr") {
+                            @Override
+                            public double apply(double... args) {
+                                return 0;
+                            }
+                        })
+                        .build());
     }
 
     @Test

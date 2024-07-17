@@ -62,9 +62,6 @@ public class ValidationResult {
 
     @Override
     public String toString() {
-        return "ValidationResult{" +
-               "valid=" + valid +
-               ", errors=" + errors +
-               '}';
+        return String.format("ValidationResult{valid=%s, errors=%s}", valid, errors);
     }
 }

@@ -1,8 +1,8 @@
 package net.objecthunter.exp4j.operator;
 
-public class AbstractOperator implements Operator {
+public abstract class AbstractOperator implements Operator {
 
-    public AbstractOperator(String symbol, int numOperands, boolean leftAssociative, int precedence) {
+    protected AbstractOperator(String symbol, int numOperands, boolean leftAssociative, int precedence) {
         this.symbol = symbol;
         this.numOperands = numOperands;
         this.leftAssociative = leftAssociative;
@@ -32,10 +32,5 @@ public class AbstractOperator implements Operator {
     @Override
     public int getNumOperands() {
         return numOperands;
-    }
-
-    @Override
-    public double apply(double... doubles) {
-        return 0;
     }
 }

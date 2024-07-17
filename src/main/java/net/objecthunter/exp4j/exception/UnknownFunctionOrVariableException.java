@@ -23,7 +23,7 @@ public class UnknownFunctionOrVariableException extends IllegalArgumentException
         this.expression = expression;
         this.token = token(expression, position, length);
         this.position = position;
-        this.message = "Unknown function or variable '" + token + "' at pos " + position + " in expression '" + expression + "'";
+        this.message = String.format("Unknown function or variable '%s' at pos %d in expression '%s'", token, position, expression);
     }
 
     private static String token(String expression, int position, int length) {

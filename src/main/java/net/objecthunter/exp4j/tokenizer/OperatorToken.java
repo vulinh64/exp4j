@@ -31,7 +31,7 @@ public class OperatorToken implements Token {
      */
     public OperatorToken(Operator op) {
         if (op == null) {
-            throw new IllegalArgumentException("Operator is unknown for token.");
+            throw new IllegalArgumentException("Operator is unknown for token");
         }
 
         this.operator = op;
