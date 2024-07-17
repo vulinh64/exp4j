@@ -15,14 +15,15 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import net.objecthunter.exp4j.exception.UnknownFunctionOrVariableException;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.operator.Operators;
-
-import java.util.Map;
-import java.util.Set;
 
 public class Tokenizer {
 
@@ -75,57 +76,65 @@ public class Tokenizer {
 
   public Token nextToken() {
     char ch = expression[pos];
+
     while (Character.isWhitespace(ch)) {
       ch = expression[++pos];
     }
+
     if (Character.isDigit(ch) || ch == '.') {
       if (lastToken != null) {
         if (lastToken.getType() == TokenType.TOKEN_NUMBER) {
           throw new IllegalArgumentException(
               String.format("Unable to parse char '%s' (Code:%s) at [%s]", ch, ch, pos));
-        } else if (implicitMultiplication
-            && ((lastToken.getType() != TokenType.TOKEN_OPERATOR)
-                && (lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN)
-                && (lastToken.getType() != TokenType.TOKEN_FUNCTION)
-                && (lastToken.getType() != TokenType.TOKEN_SEPARATOR))) {
+        }
+
+        if (isNotOperatorOpenParenthesesFunctionSeparator(implicitMultiplication, lastToken)) {
           // insert an implicit multiplication token
           lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
           return lastToken;
         }
       }
+
       return parseNumberToken(ch);
-    } else if (isArgumentSeparator(ch)) {
+    }
+
+    if (isArgumentSeparator(ch)) {
       return parseArgumentSeparatorToken();
-    } else if (isOpenParentheses(ch)) {
+    }
+
+    if (isOpenParentheses(ch)) {
       if (lastToken != null
-          && implicitMultiplication
-          && (lastToken.getType() != TokenType.TOKEN_OPERATOR
-              && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-              && lastToken.getType() != TokenType.TOKEN_FUNCTION
-              && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
+          && isNotOperatorOpenParenthesesFunctionSeparator(implicitMultiplication, lastToken)) {
         // insert an implicit multiplication token
         lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+
         return lastToken;
       }
+
       return parseParentheses(true);
-    } else if (isCloseParentheses(ch)) {
+    }
+
+    if (isCloseParentheses(ch)) {
       return parseParentheses(false);
-    } else if (Operators.isAllowedOperatorChar(ch)) {
+    }
+
+    if (Operators.isAllowedOperatorChar(ch)) {
       return parseOperatorToken(ch);
-    } else if (isAlphabetic(ch) || ch == '_') {
+    }
+
+    if (isAlphabetic(ch) || ch == '_') {
       // parse the name which can be a setVariable or a function
       if (lastToken != null
-          && implicitMultiplication
-          && (lastToken.getType() != TokenType.TOKEN_OPERATOR
-              && lastToken.getType() != TokenType.TOKEN_PARENTHESES_OPEN
-              && lastToken.getType() != TokenType.TOKEN_FUNCTION
-              && lastToken.getType() != TokenType.TOKEN_SEPARATOR)) {
+          && isNotOperatorOpenParenthesesFunctionSeparator(implicitMultiplication, lastToken)) {
         // insert an implicit multiplication token
         lastToken = new OperatorToken(Operators.getBuiltinOperator('*', 2));
+
         return lastToken;
       }
+
       return parseFunctionOrVariable();
     }
+
     throw new IllegalArgumentException(
         String.format("Unable to parse char '%s' (Code:%s) at [%s]", ch, ch, pos));
   }
@@ -146,7 +155,9 @@ public class Tokenizer {
     } else {
       lastToken = NoArgsTokenEnum.CLOSE_PARENTHESES_TOKEN;
     }
+
     pos++;
+
     return lastToken;
   }
 
@@ -164,50 +175,65 @@ public class Tokenizer {
     int lastValidLen = 1;
     Token lastValidToken = null;
     int len = 1;
+
     if (isEndOfExpression(offset)) {
       pos++;
     }
+
     testPos = offset + len - 1;
+
     while (!isEndOfExpression(testPos) && isVariableOrFunctionCharacter(expression[testPos])) {
       String name = new String(expression, offset, len);
+
       if (variableNames != null && variableNames.contains(name)) {
         lastValidLen = len;
         lastValidToken = new VariableToken(name);
       } else {
         Function f = getFunction(name);
+
         if (f != null) {
           lastValidLen = len;
           lastValidToken = new FunctionToken(f);
         }
       }
+
       len++;
+
       testPos = offset + len - 1;
     }
+
     if (lastValidToken == null) {
       throw new UnknownFunctionOrVariableException(new String(expression), pos, len);
     }
+
     pos += lastValidLen;
     lastToken = lastValidToken;
+
     return lastToken;
   }
 
   private Function getFunction(String name) {
     Function f = null;
+
     if (userFunctions != null) {
       f = userFunctions.get(name);
     }
+
     if (f == null) {
       f = Functions.getBuiltInFunction(name);
     }
+
     return f;
   }
 
   private Token parseOperatorToken(char firstChar) {
     int offset = pos;
     int len = 1;
+
     StringBuilder symbol = new StringBuilder();
-    Operator lastValid = null;
     symbol.append(firstChar);
+
+    Operator lastValid = null;
 
     while (!isEndOfExpression(offset + len)
         && Operators.isAllowedOperatorChar(expression[offset + len])) {
@@ -234,8 +260,10 @@ public class Tokenizer {
     if (userOperators != null) {
       op = userOperators.get(symbol);
     }
+
     if (op == null && symbol.length() == 1) {
       int argc = 2;
+
       if (lastToken == null) {
         argc = 1;
       } else {
@@ -251,8 +279,10 @@ public class Tokenizer {
           }
         }
       }
+
       op = Operators.getBuiltinOperator(symbol.charAt(0), argc);
     }
+
     return op;
   }
 
@@ -260,10 +290,12 @@ public class Tokenizer {
     int offset = pos;
     int len = 1;
     pos++;
+
     if (isEndOfExpression(offset + len)) {
       lastToken = new NumberToken(Double.parseDouble(String.valueOf(firstChar)));
       return lastToken;
     }
+
     while (!isEndOfExpression(offset + len)
         && isNumeric(
             expression[offset + len],
@@ -271,13 +303,16 @@ public class Tokenizer {
       len++;
       pos++;
     }
+
     // check if the e is at the end
     if (expression[offset + len - 1] == 'e' || expression[offset + len - 1] == 'E') {
       // since the e is at the end it's not part of the number and a rollback is necessary
       len--;
       pos--;
     }
+
     lastToken = NumberToken.of(expression, offset, len);
+
     return lastToken;
   }
 
@@ -303,4 +338,17 @@ public class Tokenizer {
   private boolean isEndOfExpression(int offset) {
     return expressionLength <= offset;
   }
+
+  private static boolean isNotOperatorOpenParenthesesFunctionSeparator(
+      boolean implicitMultiplication, Token lastToken) {
+    return implicitMultiplication && !NOT_CHAR_DOT_CLOSE_PARENTHESES.contains(lastToken.getType());
+  }
+
+  private static final Set<TokenType> NOT_CHAR_DOT_CLOSE_PARENTHESES =
+      new HashSet<>(
+          Arrays.asList(
+              TokenType.TOKEN_OPERATOR,
+              TokenType.TOKEN_PARENTHESES_OPEN,
+              TokenType.TOKEN_FUNCTION,
+              TokenType.TOKEN_SEPARATOR));
 }

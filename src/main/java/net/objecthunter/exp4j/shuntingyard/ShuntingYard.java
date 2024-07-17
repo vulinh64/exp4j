@@ -15,14 +15,13 @@
  */
 package net.objecthunter.exp4j.shuntingyard;
 
+import java.util.*;
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.tokenizer.OperatorToken;
 import net.objecthunter.exp4j.tokenizer.Token;
 import net.objecthunter.exp4j.tokenizer.TokenType;
 import net.objecthunter.exp4j.tokenizer.Tokenizer;
-
-import java.util.*;
 
 /** Shunting yard implementation to convert infix to reverse polish notation */
 public class ShuntingYard {
@@ -42,19 +41,21 @@ public class ShuntingYard {
    * @return a {@link net.objecthunter.exp4j.tokenizer.Token} array containing the result
    */
   public static List<Token> convertToRPN(
-      final String expression,
-      final Map<String, Function> userFunctions,
-      final Map<String, Operator> userOperators,
-      final Set<String> variableNames,
-      final boolean implicitMultiplication) {
-    final Deque<Token> deque = new ArrayDeque<>();
-    final List<Token> output = new ArrayList<>();
+      String expression,
+      Map<String, Function> userFunctions,
+      Map<String, Operator> userOperators,
+      Set<String> variableNames,
+      boolean implicitMultiplication) {
+    Deque<Token> deque = new ArrayDeque<>();
+    List<Token> output = new ArrayList<>();
 
-    final Tokenizer tokenizer =
+    Tokenizer tokenizer =
         new Tokenizer(
             expression, userFunctions, userOperators, variableNames, implicitMultiplication);
+
     while (tokenizer.hasNext()) {
       Token token = tokenizer.nextToken();
+
       switch (token.getType()) {
         case TOKEN_NUMBER:
         case TOKEN_VARIABLE:
@@ -64,47 +65,30 @@ public class ShuntingYard {
           deque.push(token); // Equivalent to stack.add
           break;
         case TOKEN_SEPARATOR:
-          while (!deque.isEmpty() && deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
-            output.add(deque.pop());
-          }
-          if (deque.isEmpty() || deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
-            throw new IllegalArgumentException(
-                "Misplaced function separator ',' or mismatched parentheses");
-          }
+          parseSeparatorToken(deque, output);
           break;
         case TOKEN_OPERATOR:
-          while (!deque.isEmpty() && deque.peek().getType() == TokenType.TOKEN_OPERATOR) {
-            OperatorToken o1 = (OperatorToken) token;
-            OperatorToken o2 = (OperatorToken) deque.peek();
-            if (o1.getOperator().getNumOperands() == 1 && o2.getOperator().getNumOperands() == 2) {
-              break;
-            } else if ((o1.getOperator().isLeftAssociative()
-                    && o1.getOperator().getPrecedence() <= o2.getOperator().getPrecedence())
-                || (o1.getOperator().getPrecedence() < o2.getOperator().getPrecedence())) {
-              output.add(deque.pop());
-            } else {
-              break;
-            }
-          }
+          parseOperatorToken(deque, (OperatorToken) token, output);
           deque.push(token);
           break;
         case TOKEN_PARENTHESES_OPEN:
           deque.push(token);
           break;
         case TOKEN_PARENTHESES_CLOSE:
-          while (deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
-            output.add(deque.pop());
-          }
-          deque.pop();
-          if (!deque.isEmpty() && deque.peek().getType() == TokenType.TOKEN_FUNCTION) {
-            output.add(deque.pop());
-          }
+          parseCloseParenthesisToken(deque, output);
           break;
         default:
           throw new IllegalArgumentException(
               "Unknown Token type encountered. This should not happen");
       }
     }
+
+    detectUnbalancedParenthesis(deque, output);
+
+    return output;
+  }
+
+  private static void detectUnbalancedParenthesis(Deque<Token> deque, List<Token> output) {
     while (!deque.isEmpty()) {
       Token t = deque.pop();
       if (t.getType() == TokenType.TOKEN_PARENTHESES_CLOSE
@@ -115,6 +99,60 @@ public class ShuntingYard {
         output.add(t);
       }
     }
-    return output;
+  }
+
+  private static void parseCloseParenthesisToken(Deque<Token> deque, List<Token> output) {
+    while (!deque.isEmpty() && deque.peek().getType() != TokenType.TOKEN_PARENTHESES_OPEN) {
+      output.add(deque.pop());
+    }
+
+    deque.pop();
+
+    if (!deque.isEmpty() && deque.peek().getType() == TokenType.TOKEN_FUNCTION) {
+      output.add(deque.pop());
+    }
+  }
+
+  private static void parseOperatorToken(
+      Deque<Token> deque, OperatorToken token, List<Token> output) {
+    while (!deque.isEmpty() && deque.peek().getType() == TokenType.TOKEN_OPERATOR) {
+      OperatorToken operation2 = (OperatorToken) deque.peek();
+
+      Operator operator = token.getOperator();
+      int precedence = operator.getPrecedence();
+
+      if (operator.getNumOperands() == 1
+          && Optional.ofNullable(operation2)
+              .map(OperatorToken::getOperator)
+              .map(Operator::getNumOperands)
+              .filter(op -> op == 2)
+              .isPresent()) {
+        break;
+      }
+
+      Optional<Integer> optionalPrecedence =
+          Optional.ofNullable(operation2)
+              .map(OperatorToken::getOperator)
+              .map(Operator::getPrecedence);
+
+      if (operator.isLeftAssociative()
+              && optionalPrecedence.filter(val -> precedence <= val).isPresent()
+          || optionalPrecedence.filter(val -> precedence < val).isPresent()) {
+        output.add(deque.pop());
+      } else {
+        break;
+      }
+    }
+  }
+
+  private static void parseSeparatorToken(Deque<Token> deque, List<Token> output) {
+    while (!deque.isEmpty() && TokenType.TOKEN_PARENTHESES_OPEN != deque.peek().getType()) {
+      output.add(deque.pop());
+    }
+
+    if (deque.isEmpty() || TokenType.TOKEN_PARENTHESES_OPEN != deque.peek().getType()) {
+      throw new IllegalArgumentException(
+          "Misplaced function separator ',' or mismatched parentheses");
+    }
   }
 }
