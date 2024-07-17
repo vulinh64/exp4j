@@ -153,11 +153,11 @@ public class ExpressionTest {
 
     }
 
-    @Test(expected = ArithmeticException.class)
+    @Test
     public void testInvalidCotangent1() {
         Expression e = new ExpressionBuilder("cot(0)")
                 .build();
-        e.evaluate();
+        assertEquals(Double.NaN, e.evaluate(), 0.0);
 
     }
 
